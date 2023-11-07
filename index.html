@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fish Collector</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src="app.js"></script>
+</head>
+<body>
+    <h1 id="title">Idle Fishing</h1>
+    <div class="menuBar">
+        <button id="homeBttn">Home</button>
+        <button id="shopBttn">Shop</button>
+    </div>
+    <div id="mainDisplay">
+        <div class="statsDisplay">
+            <h2>
+                <p>Fish: <span id="fishCount">0</span></p>
+            </h2>
+        </div>
+
+        <button id="collectFish">Collect Fish (<span id="fishValue">1</span>)</button>
+        
+        <hr>
+        <div id="menus">
+
+            <div id="upgrades">
+                <div id="fishUpgrades">
+                    <button type="fish" index="0" class="upgradeButton">Increase Fish Collection (1)<p>Cost: <span class="cost">10</span></p></button>
+                    <button type="fish" index="1" class="upgradeButton">Increase Fish Collection (100)<p>Cost: <span class="cost">100</span></p></button>
+
+                </div>
+                    <!-- <button type="fish" index="1" class="upgradeButton">Increase Fish Collection (100)<p>Cost: <span class="cost">100</span></p></button>
+                <div id="fishUpgrades">
+                    <button type="fish" index="2" class="upgradeButton">Increase Fish Collection (10000)<p>Cost: <span class="cost">10000</span></p></button>
+                </div> -->
+            </div>
+
+            <div id="automation">
+                <div id="autoUpgrades">
+                    <button type="auto" index="0" class="upgradeButton">Increase Fish Collection (1)<p>Cost: <span class="cost">10</span></p></button>
+                    <button type="auto" index="1" class="upgradeButton">Increase Fish Collection (100)<p>Cost: <span class="cost">100</span></p></button>
+                </div>
+            </div>
+
+    </div>
+
+</body>
+
+</html>

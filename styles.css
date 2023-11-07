@@ -1,0 +1,65 @@
+/* styles.css */
+body {
+ font-family: Arial, sans-serif;
+ background-color: #f0f0f0;
+ text-align: center;
+}
+
+h1 {
+ color: #007bff;
+}
+
+
+button {
+ background-color: #007bff;
+ color: #fff;
+ padding: 10px 20px;
+ border: none;
+ cursor: pointer;
+}
+
+button:hover {
+ background-color: #0056b3;
+}
+
+button:disabled {
+ background-color: #ccc;
+ color: #666;
+ cursor: not-allowed;
+}
+
+#mainDisplay {
+ display:inline-block;
+}
+
+.upgradeButton {
+ font-size: medium;
+}
+.upgradeButton p{
+ font-size: small;
+}
+
+.menuBar{
+ background-color: #007bff;
+ color: #fff;
+ padding: 10px;
+ text-align: left;
+}
+.menuBar button{
+ border:#000;
+}
+
+#fishUpgrades {
+ display: inline;
+}
+
+#menus {
+ display: inline;
+}
+
+#upgrades {
+ display: inline;
+}
+#automation {
+ display:none;
+}
