@@ -109,6 +109,7 @@ function upgradeBought(data){
                 // Update the cost of the upgrade and display it in the button
                 upgradesList[i].data[index].cost *= upgradesList[i].data[index].costMulti;
                 data.querySelector(".cost").innerHTML = formatNumber(upgradesList[i].data[index].cost);
+                data.querySelector(".owned").innerHTML = formatNumber(upgradesList[i].data[index].level);
             }
         }
     }
