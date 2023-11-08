@@ -5,7 +5,7 @@
 let fish = {
     count : 1,
     value : 1,
-    multi : 10000,
+    multi : 1,
     lifetime: 0
 };
 let gamestage = 0;
@@ -47,7 +47,8 @@ let upgradesList = [{type:"fish", data:fishUpgrade},{type:"feature", data:featur
 let shopButtons = [
     {
         desc : "Unlock the buy Max button",
-        cost : "10k",
+        name : "maxBuy",
+        cost : 10000, //10k
         bought: false
     }
 ]
@@ -69,16 +70,31 @@ $("#shopBttn").click(function(){
     switchMenu("#shopUpgrades");
 });
 $("#debugBttn").click(function(){
-    // addShopUpgrade(0);
-    //switchMenu("#debug");
+    $("#shopBttn").prop("disabled", false);
+});
+
+//Feature Unlock Buttons ---------------
+$("#shopUpgrades").on('click', "#maxBuy", function(){
+    //Take money away and stuff
+    for (let i=0; i < shopButtons.length; i++){
+        if (shopButtons[i].name == 'maxBuy'){
+            if (fish.count > shopButtons[i].cost){
+                $("#maxBuy").prop("disabled", true);
+                console.log(fish.count, shopButtons[i].cost);
+                fish.count -= shopButtons[i].cost;
+            }
+        }
+    }
+
+    updateDisplay();
 });
 
 
 //End Button handling ----------------------
 function addShopUpgrade(index){
-    newUpgrade = `<button type='shopUpgrade' index='${index}' class='featureButton'>`
+    newUpgrade = `<button id="${shopButtons[index].name}"type='shopUpgrade' index='${index}' class='featureButton'>`
     newUpgrade += `${shopButtons[index].desc}`
-    newUpgrade += `<p>Cost: <span class="cost">${shopButtons[index].cost}</span></p>`
+    newUpgrade += `<p>Cost: <span class="cost">${formatNumber(shopButtons[index].cost)}</span></p>`
     $("#shopUpgrades").append( newUpgrade );
 }
 
@@ -106,6 +122,7 @@ function upgradeBought(data){
     //Update buttons and stats on the page
     updateDisplay();
 }
+
 
 //Disable/Enable cost buttons
 function buttonCheck(button){
@@ -138,12 +155,10 @@ function updateDisplay() {
 }
 
 function checkUnlocks(){
-    console.log("CheckUnlucks");
     if (fish.lifetime > 10000){
         if (gamestage == 0){
-            console.log("Made it!");
             gamestage += 1;
-            document.getElementById("shopBttn").disabled = false;
+            $("#shopBttn").prop("disabled", false);
             addShopUpgrade(0);
         }
     }
