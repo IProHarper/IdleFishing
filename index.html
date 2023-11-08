@@ -14,6 +14,7 @@
     <div class="menuBar">
         <button id="homeBttn">Home</button>
         <button id="shopBttn" disabled>Shop</button>
+        <button id="debugBttn">Debug</button>
     </div>
     <div id="mainDisplay">
         <div class="row align-items-start">
@@ -27,8 +28,7 @@
         <button id="collectFish">Collect Fish (<span id="fishValue">1</span>)</button>
         
         <hr>
-        <div id="menus">
-
+        <div id="pageDisplay">
             <div id="upgrades">
                 <div id="fishUpgrades">
                     <button type="fish" index="0" class="upgradeButton">Fish Collection +1 (<span class="owned">0</span>)<p>Cost: <span class="cost">10</span></p></button>
@@ -37,11 +37,9 @@
             </div>
 
             <div id="automation">
-                <div id="autoUpgrades">
-                    <button type="auto" index="0" class="upgradeButton">Unlock  <p>Cost: <span class="cost">10</span></p></button>
-                    <button type="auto" index="1" class="upgradeButton">Increase Fish Collection (100)<p>Cost: <span class="cost">100</span></p></button>
-                </div>
+                <div id="autoUpgrades"></div>
             </div>
+            <div id="shopUpgrades"></div>
 
     </div>
 

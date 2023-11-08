@@ -8,6 +8,7 @@ let fish = {
     multi : 10000,
     lifetime: 0
 };
+let gamestage = 0;
 fishUpgrade = [
     {
         stageReq: 0,
@@ -25,7 +26,7 @@ fishUpgrade = [
     },
     {
         stageReq: 2,
-        cost : 10000,
+        cost : 100,
         costMulti : 20,
         countIncrease : 10000,
         level : 0
@@ -41,62 +42,47 @@ featureUpgrade = [
     }
 ];
 
-let upgradesList = [{type:"fish", data:fishUpgrade}];//,{type:"feature", data:featureUpgrade}]
+let upgradesList = [{type:"fish", data:fishUpgrade},{type:"feature", data:featureUpgrade}]
 
+let shopButtons = [
+    {
+        desc : "Unlock the buy Max button",
+        cost : "10k",
+        bought: false
+    }
+]
+
+//Button handling --------------
 // Function to collect fish
 $("#collectFish").click(function() {
     fish.count += fish.value * fish.multi;
     fish.lifetime += fish.value * fish.multi
     updateDisplay();
 });
-
-$(".upgradeButton").click(function() {
+$("#upgrades").on('click','.upgradeButton',function() {
     upgradeBought(this);
 });
-
 $("#homeBttn").click(function(){
     switchMenu("#upgrades");
 });
 $("#shopBttn").click(function(){
-    switchMenu("#automation");
+    switchMenu("#shopUpgrades");
+});
+$("#debugBttn").click(function(){
+    // addShopUpgrade(0);
+    //switchMenu("#debug");
 });
 
-// Function to handle upgrade button clicks
-$(".upgradeButton").click(function() {
-    upgradeBought(this);
-});
 
-function addFishUpgradeButton(index,upgrade){
-    // Select the parent element where you want to add the new button
-    const parentElement = document.getElementById("fishUpgrades");
-
-    // Create a new button element
-    const newButton = document.createElement("button");
-
-    // Set attributes and content for the button
-    newButton.type = "fish";
-    newButton.setAttribute("index", index);
-    newButton.className = "upgradeButton";
-    newButton.textContent = "Fish Collection + ",upgrade.countIncrease;
-
-    // Create a paragraph element for the cost information
-    const costParagraph = document.createElement("p");
-    costParagraph.textContent = "Cost: ";
-
-    // Create a span element for the cost value
-    const costSpan = document.createElement("span");
-    costSpan.className = "cost";
-    costSpan.textContent = upgrade.cost;
-
-    // Append the span element to the paragraph element
-    costParagraph.appendChild(costSpan);
-
-    // Append the paragraph element to the button element
-    newButton.appendChild(costParagraph);
-
-    // Append the new button to the parent element
-    parentElement.appendChild(newButton);
+//End Button handling ----------------------
+function addShopUpgrade(index){
+    newUpgrade = `<button type='shopUpgrade' index='${index}' class='featureButton'>`
+    newUpgrade += `${shopButtons[index].desc}`
+    newUpgrade += `<p>Cost: <span class="cost">${shopButtons[index].cost}</span></p>`
+    $("#shopUpgrades").append( newUpgrade );
 }
+
+
 
 // Function to process the purchase of an upgrade
 function upgradeBought(data){
@@ -125,8 +111,6 @@ function upgradeBought(data){
 function buttonCheck(button){
     document.querySelectorAll('.upgradeButton').forEach(function (button){
         // Disable the button if the player doesn't have enough fish to buy the upgrade
-            // console.log(button);
-            // console.log(upgradesList[0].data[button.getAttribute("index")]);
             if (button.getAttribute("type") == "fish"){
                 let cost = upgradesList[0].data[button.getAttribute("index")].cost;
                 if (fish.count < cost) {
@@ -141,7 +125,7 @@ function buttonCheck(button){
 
 //Hide all the irrelevant pages
 function switchMenu(menu){
-    $("#menus").children().css("display", "none");
+    $("#pageDisplay").children().css("display", "none");
     $(menu).css("display", "inline");
 }
 
@@ -150,13 +134,25 @@ function updateDisplay() {
     $("#fishCount").html(formatNumber(fish.count));
     $("#fishValue").html(formatNumber(fish.value));
     buttonCheck();
+    checkUnlocks();
+}
+
+function checkUnlocks(){
+    console.log("CheckUnlucks");
+    if (fish.lifetime > 10000){
+        if (gamestage == 0){
+            console.log("Made it!");
+            gamestage += 1;
+            document.getElementById("shopBttn").disabled = false;
+            addShopUpgrade(0);
+        }
+    }
 }
 
 // Function to initialize the game
 function initializeGame() {
     updateDisplay();
     $("#upgrades").css("display", "block");
-    $("#shopBttn").disabled = true;
 }
 
 // Initialize the game
