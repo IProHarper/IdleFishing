@@ -2,7 +2,10 @@
 <html>
 <head>
     <title>Fish Collector</title>
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"> -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/break_infinity.js@2"></script>
+
     <link rel="stylesheet" type="text/css" href="styles.css">
     <script src="app.js"></script>
 </head>
@@ -10,13 +13,15 @@
     <h1 id="title">Idle Fishing</h1>
     <div class="menuBar">
         <button id="homeBttn">Home</button>
-        <button id="shopBttn">Shop</button>
+        <button id="shopBttn" disabled>Shop</button>
     </div>
     <div id="mainDisplay">
+        <div class="row align-items-start">
         <div class="statsDisplay">
-            <h2>
+            <h2 class="col">
                 <p>Fish: <span id="fishCount">0</span></p>
             </h2>
+        </div>
         </div>
 
         <button id="collectFish">Collect Fish (<span id="fishValue">1</span>)</button>
@@ -28,13 +33,12 @@
                 <div id="fishUpgrades">
                     <button type="fish" index="0" class="upgradeButton">Fish Collection +1 (<span class="owned">0</span>)<p>Cost: <span class="cost">10</span></p></button>
                     <button type="fish" index="1" class="upgradeButton">Fish Collection +100 (<span class="owned">0</span>)<p>Cost: <span class="cost">100</span></p></button>
-
                 </div>
             </div>
 
             <div id="automation">
                 <div id="autoUpgrades">
-                    <button type="auto" index="0" class="upgradeButton">Increase Fish Collection (1)<p>Cost: <span class="cost">10</span></p></button>
+                    <button type="auto" index="0" class="upgradeButton">Unlock  <p>Cost: <span class="cost">10</span></p></button>
                     <button type="auto" index="1" class="upgradeButton">Increase Fish Collection (100)<p>Cost: <span class="cost">100</span></p></button>
                 </div>
             </div>
