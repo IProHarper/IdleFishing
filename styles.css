@@ -8,7 +8,15 @@ body {
 h1 {
  color: #007bff;
 }
-
+.menuBar{
+ background-color: #007bff;
+ color: #fff;
+ padding: 10px;
+ text-align: left;
+}
+.menuBar button{
+ border:#000;
+}
 
 button {
  background-color: #007bff;
@@ -16,6 +24,7 @@ button {
  padding: 10px 20px;
  border: none;
  cursor: pointer;
+ border:2px solid#000;
 }
 
 button:hover {
@@ -27,11 +36,6 @@ button:disabled {
  color: #666;
  cursor: not-allowed;
 }
-
-#mainDisplay {
- display:inline-block;
-}
-
 .upgradeButton {
  font-size: medium;
 }
@@ -39,28 +43,59 @@ button:disabled {
  font-size: small;
 }
 
-.menuBar{
- background-color: #007bff;
- color: #fff;
- padding: 10px;
- text-align: left;
+
+
+
+
+
+#mainDisplay {
+ width: 100%;
+ display: table;
+ align-items: center;
 }
-.menuBar button{
- border:#000;
+#statsDisplay {
+ margin: auto;
+ width: 80%;
+}
+#pageDisplay {
+ margin: auto;
+ width: 80%;
+}
+#pageDisplay button{
+ width: 80%;
+ margin-bottom: 10px;
+}
+
+#upgrades {
+ width: 33%;
+ display: inline-grid;
+ float: left;
+ border-right:2px solid#000;
+}
+
+#automation{
+ width: 33%;
+ height: 100%;
+ display: inline-grid;
+ float: right;
 }
 
 #fishUpgrades {
- display: inline;
+ display: block;
+ width: 80%;
+}
+#autoUpgrades {
+ display: block;
+ width: 80%;
+ margin-bottom: 10px;
 }
 
 #menus {
  display: inline;
+ margin: 5%;
+ padding: 5%;
 }
 
-#upgrades {
- display: inline;
-}
 #shopUpgrades {
  display:none;
 }
-

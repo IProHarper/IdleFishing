@@ -17,30 +17,28 @@
         <button id="debugBttn">Debug</button>
     </div>
     <div id="mainDisplay">
-        <div class="row align-items-start">
         <div class="statsDisplay">
             <h2 class="col">
                 <p>Fish: <span id="fishCount">0</span></p>
             </h2>
-        </div>
         </div>
 
         <button id="collectFish">Collect Fish (<span id="fishValue">1</span>)</button>
         
         <hr>
         <div id="pageDisplay">
-            <div id="upgrades">
+            
+            <div id="upgrades" class="home">
                 <div id="fishUpgrades">
                     <button type="fish" index="0" class="upgradeButton">Fish Collection +1 (<span class="owned">0</span>)<p>Cost: <span class="cost">10</span></p></button>
-                    <button type="fish" index="1" class="upgradeButton">Fish Collection +100 (<span class="owned">0</span>)<p>Cost: <span class="cost">100</span></p></button>
+                    <button type="fish" index="1" class="upgradeButton">Fish Collection +10 (<span class="owned">0</span>)<p>Cost: <span class="cost">100</span></p></button>
                 </div>
             </div>
-
-            <div id="automation">
+            <div id="automation" class="home">
                 <div id="autoUpgrades"></div>
             </div>
             <div id="shopUpgrades"></div>
-
+        </div>
     </div>
 
 </body>
