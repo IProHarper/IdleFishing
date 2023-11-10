@@ -14,32 +14,32 @@ fishUpgrade = [
     {
         stageReq: 0,
         cost : 10,
-        costMulti : 2,
+        costMulti : 1.2,
         countIncrease : 1,
         level : 0
     },
     {
         stageReq: 1,
         cost : 100,
-        costMulti : 2,
+        costMulti : 1.3,
         countIncrease : 10,
         level : 0
     },
     {
         stageReq: 2,
         cost : 100,
-        costMulti : 20,
+        costMulti : 1.4,
         countIncrease : 10000,
         level : 0
     }
 ];
 automationUpgrade = [
     {
-        desc: "Auto Fishing + 1/s",
+        desc: "Auto Fishing + 10/s",
         index: 0,
         cost : 100,
-        costMulti : 3,
-        countIncrease : 1,
+        costMulti : 1.35,
+        countIncrease : 10,
         level : 0
     }
 ];
@@ -59,7 +59,7 @@ let shopUpgrades = [
     {
         desc : "Unlock the Buy Max for Auto Fish",
         name : "maxBuyUnlockAuto",
-        cost : 50000, //10k
+        cost : 50000, //50k
         bought: false,
     }
 ];
@@ -88,6 +88,7 @@ $("#homeBttn").click(function(){
 });
 $("#shopBttn").click(function(){
     switchMenu("#shopUpgrades");
+    $("#shopBttn").innerHTML = `<span class="badge"></span>`;
 });
 $("#debugBttn").click(function(){
      fish.value += 4000;
@@ -153,41 +154,40 @@ function addUpgrade(index,type,id){
 
 
 // Function to process the purchase of an upgrade
-//CLEAN THIS WITH A SWITCH
 function upgradeBought(data){
-
-    
     // Get the index and type of the clicked button
     let index = data.getAttribute('index');
     upgrade = upgradesList[getUpgradeListIndex(data.getAttribute('type'))].data[index];
     // Iterate through the upgradesList to find the matching upgrade
-        // Check if the type of the clicked button matches the current upgrade type
-            // Check if the player has enough fish to purchase the upgrade
-            if (fish.count >= upgrade.cost) {
-                fish.count -= upgrade.cost;
-                upgrade.level += 1;
-                // Update the cost of the upgrade and display it in the button
-                upgrade.cost *= upgrade.costMulti;
-                data.querySelector(".owned").innerHTML = formatNumber(upgrade.level);
-                data.querySelector(".cost").innerHTML = formatNumber(upgrade.cost);
-                //Handle the function of the button
-                switch(data.getAttribute('type')){
-                    case "fish":
-                        fish.value += upgrade.countIncrease;
-                        break;;
-                    case "auto":
-                        fish.perSecond += upgrade.countIncrease;
-                        break;;
-                    default:
-                        console.log("No handler for upgrade type");
-                }
-            }
+    // Check if the type of the clicked button matches the current upgrade type
+    // Check if the player has enough fish to purchase the upgrade
+    if (fish.count >= upgrade.cost) {
+        fish.count -= upgrade.cost;
+        upgrade.level += 1;
+        // Update the cost of the upgrade and display it in the button
+        upgrade.cost *= upgrade.costMulti;
+        data.querySelector(".owned").innerHTML = formatNumber(upgrade.level);
+        data.querySelector(".cost").innerHTML = formatNumber(upgrade.cost);
+        //Handle the function of the button
+        switch(data.getAttribute('type')){
+            case "fish":
+                fish.value += upgrade.countIncrease;
+                break;;
+            case "auto":
+                fish.perSecond += upgrade.countIncrease;
+                break;;
+            default:
+                console.log("No handler for upgrade type");
+        }
+    }
     //Update buttons and stats on the page
     updateDisplay();
 }
 
-function updateAutoCollect(){
-
+function autoCollect(){
+    fish.count += fish.perSecond / 2;
+    updateDisplay();
+    console.log("Done");
 }
 
 //Function to return the index of the upgrade types
@@ -226,7 +226,7 @@ function buttonCheck(button){
 //Format the number as 1k, 1m then 1eX
 function formatNumber(number) {
     if (number < 1000) {
-        return number.toString(); // No formatting needed for numbers less than 1000
+        return number.toFixed(2).toString(); // No formatting needed for numbers less than 1000
     } else if (number < 1000000) {
         return (number / 1000).toFixed(2) + 'k'; // Format as 'X.XXk' for thousands
     } else if (number < 1000000000){
@@ -246,8 +246,8 @@ function switchMenu(menu){
 function updateDisplay() {
     $("#fishCount").html(formatNumber(fish.count));
     $("#fishValue").html(formatNumber(fish.value));
-    buttonCheck();
     checkUnlocks();
+    buttonCheck();
 }
 
 function checkUnlocks(){
@@ -255,6 +255,7 @@ function checkUnlocks(){
         gamestage++;
         $("#shopBttn").prop("disabled", false);
         addUpgrade(gamestage-1,"feature","#shopUpgrades");
+        const intervalId = setInterval(autoCollect, 500);
     }
     if (fish.lifetime > 15000 && gamestage == 1){
         gamestage++;
@@ -270,6 +271,7 @@ function checkUnlocks(){
 function initializeGame() {
     updateDisplay();
     $("#pageDisplay").css("display", "block");
+    //var time = Date.now();
 }
 
 // Initialize the game
