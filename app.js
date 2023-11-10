@@ -12,6 +12,7 @@ let fish = {
 let gamestage = 0;
 fishUpgrade = [
     {
+        desc: "Fish Collection +1",
         stageReq: 0,
         cost : 10,
         costMulti : 1.2,
@@ -19,17 +20,19 @@ fishUpgrade = [
         level : 0
     },
     {
+        desc: "Fish Collection +10",
         stageReq: 1,
         cost : 100,
-        costMulti : 1.3,
+        costMulti : 1.25,
         countIncrease : 10,
         level : 0
     },
     {
+        desc: "Fish Collection +100",
         stageReq: 2,
-        cost : 100,
-        costMulti : 1.4,
-        countIncrease : 10000,
+        cost : 10000,
+        costMulti : 1.3,
+        countIncrease : 100000,
         level : 0
     }
 ];
@@ -40,6 +43,14 @@ automationUpgrade = [
         cost : 100,
         costMulti : 1.35,
         countIncrease : 10,
+        level : 0
+    },
+    {
+        desc: "Auto Fishing + 100/s",
+        index: 1,
+        cost : 10000,
+        costMulti : 1.15,
+        countIncrease : 1000,
         level : 0
     }
 ];
@@ -123,6 +134,12 @@ $("#shopUpgrades").on('click', ".featureButton", function(){
     }
     updateDisplay();
 });
+
+// function checkButtonUnlock(){
+//     for (let i = 0; i < upgrade.length; i++){
+//         if (upgrade[i].stageReq == )
+//     }
+// }
 
 //WORKING ON THESE FUNCTIONS
 function addBuyMax(index,type){
@@ -253,7 +270,9 @@ function updateDisplay() {
     $("#fishValue").html(formatNumber(fish.value));
     $("#fishPerSec").html(formatNumber(fish.perSecond));
     checkUnlocks();
+    //checkButtonUnlock();
     buttonCheck();
+
 }
 
 //Progressive unlocks.
@@ -272,6 +291,14 @@ function checkUnlocks(){
     if (fish.lifetime > 50000 && gamestage == 2){
         gamestage++;
         addUpgrade(gamestage-1,"feature","#shopUpgrades");
+    }
+    if (fish.lifetime > 100000 && gamestage == 3){
+        gamestage++;
+        addUpgrade(2,"fish","#fishUpgrades");
+    }
+    if (fish.lifetime > 150000 && gamestage == 4 && shopUpgrades[0].bought){
+        gamestage++;
+        addUpgrade(1,"auto","#autoUpgrades");
     }
 }
 
