@@ -112,10 +112,10 @@ $("#shopUpgrades").on('click', ".featureButton", function(){
                 addUpgrade(0,"auto","#autoUpgrades");
                 break;;
             case "maxBuyUnlockClick":
-                addBuyMax(1);
+                addBuyMax(0);
                 break;;
             case "maxBuyUnlockAuto":
-                addBuyMax(2);
+                addBuyMax(1);
                 break;;
             default:
                 console.log("Couldn't find handler");
@@ -125,8 +125,16 @@ $("#shopUpgrades").on('click', ".featureButton", function(){
 });
 
 //WORKING ON THESE FUNCTIONS
-function addBuyMax(upgrade){
+function addBuyMax(index,type){
     console.log("Buy max for upgrade ", upgrade);
+    document.querySelectorAll('#fishUpgrades').forEach(function (button){
+        let newUpgrade = `<button type="${fish}" index="0" class="buyMaxBttn>"`
+        newUpgrade += `</button>`
+//<button type="fish" index="0" class="upgradeButton">Fish Collection +1 (<span class="owned">0</span>)<p>Cost: <span class="cost">10</span></p></button>
+
+        button.append(newUpgrade);
+    });
+
 }
 //Calculate how many I can buy of the passed upgrade
 function calcBuyMax(upgrade){
@@ -158,8 +166,6 @@ function upgradeBought(data){
     // Get the index and type of the clicked button
     let index = data.getAttribute('index');
     upgrade = upgradesList[getUpgradeListIndex(data.getAttribute('type'))].data[index];
-    // Iterate through the upgradesList to find the matching upgrade
-    // Check if the type of the clicked button matches the current upgrade type
     // Check if the player has enough fish to purchase the upgrade
     if (fish.count >= upgrade.cost) {
         fish.count -= upgrade.cost;
@@ -187,7 +193,6 @@ function upgradeBought(data){
 function autoCollect(){
     fish.count += fish.perSecond / 2;
     updateDisplay();
-    console.log("Done");
 }
 
 //Function to return the index of the upgrade types
@@ -246,12 +251,15 @@ function switchMenu(menu){
 function updateDisplay() {
     $("#fishCount").html(formatNumber(fish.count));
     $("#fishValue").html(formatNumber(fish.value));
+    $("#fishPerSec").html(formatNumber(fish.perSecond));
     checkUnlocks();
     buttonCheck();
 }
 
+//Progressive unlocks.
+//TODO Clean up.
 function checkUnlocks(){
-    if (fish.lifetime > 5000 && gamestage == 0){
+    if (fish.lifetime > 2000 && gamestage == 0){
         gamestage++;
         $("#shopBttn").prop("disabled", false);
         addUpgrade(gamestage-1,"feature","#shopUpgrades");
