@@ -6,6 +6,7 @@ let fish = {
     count : 1,
     value : 1,
     multi : 1,
+    perSecond: 0,
     lifetime: 0
 };
 let gamestage = 0;
@@ -42,23 +43,32 @@ automationUpgrade = [
         level : 0
     }
 ];
-
-let upgradesList = [{type:"fish", data:fishUpgrade},{type:"auto", data:automationUpgrade}]
-
-let shopButtons = [
+let shopUpgrades = [
     {
         desc : "Unlock Auto Fishing",
         name : "autoFishUnlock",
         cost : 5000, //5k
-        bought: false
+        bought: false,
     },
     {
-        desc : "Unlock the buy Max button",
-        name : "maxBuyUnlock",
+        desc : "Unlock the Buy Max for Fish Collect",
+        name : "maxBuyUnlockClick",
         cost : 10000, //10k
-        bought: false
+        bought: false,
+    },
+    {
+        desc : "Unlock the Buy Max for Auto Fish",
+        name : "maxBuyUnlockAuto",
+        cost : 50000, //10k
+        bought: false,
     }
-]
+];
+
+let upgradesList = [{type:"fish", data:fishUpgrade, class:"upgradeButton"},
+                    {type:"auto", data:automationUpgrade, class:"upgradeButton"},
+                    {type:"feature",data:shopUpgrades, class:"featureButton"}]
+
+
 
 //Button handling --------------
 // Function to collect fish
@@ -86,115 +96,101 @@ $("#debugBttn").click(function(){
 });
 
 //Feature Unlock Buttons ---------------
-$("#shopUpgrades").on('click', "#autoFishUnlock", function(){
+$("#shopUpgrades").on('click', ".featureButton", function(){
     //Take money away and stuff
     let index = this.getAttribute("index");
-    if (shopButtons[index].name == 'autoFishUnlock'){
-        if (fish.count > shopButtons[index].cost){
-            $("#autoFishUnlock").prop("disabled", true);
-            $("#autoFishUnlock").css("background-color", "#ffea00");
-            $("#autoFishUnlock").css("color", "black");
-            fish.count -= shopButtons[index].cost;
-            shopButtons[index].bought = true;
+    upgrade = upgradesList[getUpgradeListIndex(this.getAttribute("type"))].data[index];
+    if (fish.count > upgrade.cost && !upgrade.bought){
+        $(this).prop("disabled", true);
+        $(this).css("background-color", "#ffea00");
+        $(this).css("color", "black");
+        fish.count -= upgrade.cost;
+        upgrade.bought = true;
+        switch (upgrade.name){
+            case "autoFishUnlock":
+                addUpgrade(0,"auto","#autoUpgrades");
+                break;;
+            case "maxBuyUnlockClick":
+                addBuyMax(1);
+                break;;
+            case "maxBuyUnlockAuto":
+                addBuyMax(2);
+                break;;
+            default:
+                console.log("Couldn't find handler");
         }
     }
-    addAutoUpgrade(index,"auto");
-    updateDisplay();
-});
-
-$("#shopUpgrades").on('click', "#maxBuy", function(){
-    //Take money away and stuff
-    let index = this.getAttribute("index");
-    if (shopButtons[index].name == 'maxBuyUnlock'){
-        if (fish.count > shopButtons[index].cost){
-            $("#maxBuy").prop("disabled", true);
-            $("#maxBuy").css("background-color", "#ffea00");
-            $("#maxBuy").css("color", "black");
-            fish.count -= shopButtons[index].cost;
-            shopButtons[index].bought = true;
-        }
-    }
-    addBuyMax();
     updateDisplay();
 });
 
 //WORKING ON THESE FUNCTIONS
 function addBuyMax(upgrade){
+    console.log("Buy max for upgrade ", upgrade);
 }
-//WORKING ON THESE FUNCTIONS
+//Calculate how many I can buy of the passed upgrade
 function calcBuyMax(upgrade){
-    let totalCost = 0;
-    let maxUpgrades = 0;
-    let cost = upgrade.cost
-    // Keep buying upgrades until the total cost exceeds the available money
-    while (totalCost + cost <= fish.count) {
-        totalCost += cost;
-        cost *= upgrade.costMulti;
-        maxUpgrades++;
+    //t = total cost, c = cost, m = Max upgrades
+    let [t,m,c] = [0,0,upgrade.cost];
+    while (t + c <= fish.count) {
+        t += c;
+        c *= upgrade.costMulti;
+        m++;
     }
-    return (maxUpgrades);
+    return (m,t);
 }
 
-//End Button handling ----------------------
-//Add a new unlockable upgrade in the shop
-function addShopUpgrade(index){
-    newUpgrade = `<button id="${shopButtons[index].name}"type='shopUpgrade' index='${index}' class='featureButton'>`
-    newUpgrade += `${shopButtons[index].desc}`
-    newUpgrade += `<p>Cost: <span class="cost">${formatNumber(shopButtons[index].cost)}</span></p>`
-    $("#shopUpgrades").append( newUpgrade );
-}
 
 //Add Upgrade buttons for automation use
-function addAutoUpgrade(index,type){
-    upgrade = upgradesList[returnUpgradeListIndex(type)].data[index]
-    newUpgrade = `<button type='${type}' index='${index}' class='upgradeButton'>`
+function addUpgrade(index,type,id){
+    upgrade = upgradesList[getUpgradeListIndex(type)].data[index];
+    newUpgrade = `<button type='${type}' index='${index}' class='${upgradesList[getUpgradeListIndex(type)].class}'>`
     newUpgrade += `${upgrade.desc} (<span class="owned">0</span>)`
     newUpgrade += `<p>Cost: <span class="cost">${formatNumber(upgrade.cost)}</span></p>`
-    $("#autoUpgrades").append( newUpgrade );
+    $(id).append( newUpgrade );
 }
 
 
 
 // Function to process the purchase of an upgrade
+//CLEAN THIS WITH A SWITCH
 function upgradeBought(data){
+
+    
     // Get the index and type of the clicked button
     let index = data.getAttribute('index');
+    upgrade = upgradesList[getUpgradeListIndex(data.getAttribute('type'))].data[index];
     // Iterate through the upgradesList to find the matching upgrade
         // Check if the type of the clicked button matches the current upgrade type
-        if (data.getAttribute('type') == "fish"){
-            let fishupgradeBttn = upgradesList[0].data[index];
             // Check if the player has enough fish to purchase the upgrade
-            if (fish.count >= fishupgradeBttn.cost) {
-                fish.count -= fishupgradeBttn.cost;
-                fish.value += fishupgradeBttn.countIncrease;
-                fishupgradeBttn.level += 1;
+            if (fish.count >= upgrade.cost) {
+                fish.count -= upgrade.cost;
+                upgrade.level += 1;
                 // Update the cost of the upgrade and display it in the button
-                fishupgradeBttn.cost *= fishupgradeBttn.costMulti;
-                data.querySelector(".cost").innerHTML = formatNumber(fishupgradeBttn.cost);
-                data.querySelector(".owned").innerHTML = formatNumber(fishupgradeBttn.level);
+                upgrade.cost *= upgrade.costMulti;
+                data.querySelector(".cost").innerHTML = formatNumber(upgrade.cost);
+                data.querySelector(".owned").innerHTML = formatNumber(upgrade.level);
+                //Handle the function of the button
+                switch(data.getAttribute('type')){
+                    case "fish":
+                        fish.value += upgrade.countIncrease;
+                        break;;
+                    case "auto":
+                        fish.perSecond += upgrade.countIncrease;
+                        break;;
+                    default:
+                        console.log("No handler for upgrade type");
+                }
             }
-        }
-        if (data.getAttribute('type') == "auto"){
-            console.log("+1 per second");
-            let fishupgradeBttn = upgradesList[1].data[index];
-            // Check if the player has enough fish to purchase the upgrade
-            if (fish.count >= fishupgradeBttn.cost) {
-                fish.count -= fishupgradeBttn.cost;
-                //HANDLE THE FISH PER SECOND!
-                fish.value += fishupgradeBttn.countIncrease;
-                fishupgradeBttn.level += 1;
-                // Update the cost of the upgrade and display it in the button
-                fishupgradeBttn.cost *= fishupgradeBttn.costMulti;
-                data.querySelector(".cost").innerHTML = formatNumber(fishupgradeBttn.cost);
-                data.querySelector(".owned").innerHTML = formatNumber(fishupgradeBttn.level);
-            }
-        }
     //Update buttons and stats on the page
     updateDisplay();
 }
 
+function updateAutoCollect(){
+
+}
+
 //Function to return the index of the upgrade types
-function returnUpgradeListIndex(type){
+function getUpgradeListIndex(type){
     for (let i = 0; i < upgradesList.length; i++){
         if (upgradesList[i].type == type){
             return (i)
@@ -206,7 +202,7 @@ function returnUpgradeListIndex(type){
 function buttonCheck(button){
     document.querySelectorAll('.upgradeButton').forEach(function (button){
         // Disable the button if the player doesn't have enough fish to buy the upgrade
-            let listIndex = returnUpgradeListIndex(button.getAttribute("type"));
+            let listIndex = getUpgradeListIndex(button.getAttribute("type"));
             let cost = upgradesList[listIndex].data[button.getAttribute("index")].cost;
                 if (fish.count < cost) {
                     button.disabled = true;
@@ -262,12 +258,14 @@ function updateDisplay() {
 }
 
 function checkUnlocks(){
-    if (fish.lifetime > 5000){
-        if (gamestage == 0){
-            gamestage += 1;
-            $("#shopBttn").prop("disabled", false);
-            addShopUpgrade(0);
-        }
+    if (fish.lifetime > 5000 && gamestage == 0){
+        gamestage++;
+        $("#shopBttn").prop("disabled", false);
+        addUpgrade(gamestage-1,"feature","#shopUpgrades");
+    }
+    if (fish.lifetime > 15000 && gamestage == 1){
+        gamestage++;
+        addUpgrade(gamestage-1,"feature","#shopUpgrades");
     }
 }
 
