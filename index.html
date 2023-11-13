@@ -29,6 +29,7 @@
         <hr>
         <div id="pageDisplay">
             
+
             <div id="upgrades" class="home">
                 <div id="fishUpgrades">
                     <button type="fish" index="0" class="upgradeButton">Fish Collection +1 (<span class="owned">0</span>)<p>Cost: <span class="cost">10</span></p></button>
@@ -38,11 +39,20 @@
             <div id="automation" class="home">
                 <div id="autoUpgrades"></div>
             </div>
-            <div id="shop"></div>
-                <div id="shopUpgrades"></div>
+                
         </div>
     </div>
-
+    <div id="mainModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="closeBttn">&times;</span>
+                <h2><span id="modalTitle">Shop</span></h2>
+            </div>
+            <div class="modal-body">
+                <div id="shopUpgrades"></div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

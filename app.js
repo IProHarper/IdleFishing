@@ -13,27 +13,30 @@ let gamestage = 0;
 fishUpgrade = [
     {
         desc: "Fish Collection +1",
-        stageReq: 0,
+        levelForNext: 10,
         cost : 10,
         costMulti : 1.2,
         countIncrease : 1,
-        level : 0
+        level : 0,
+        displaying: true
     },
     {
         desc: "Fish Collection +10",
-        stageReq: 1,
+        levelForNext: 10,
         cost : 100,
         costMulti : 1.25,
         countIncrease : 10,
-        level : 0
+        level : 0,
+        displaying: true
     },
     {
         desc: "Fish Collection +100",
-        stageReq: 2,
+        levelForNext: 10,
         cost : 10000,
         costMulti : 1.3,
         countIncrease : 100000,
-        level : 0
+        level : 0,
+        displaying: false
     }
 ];
 automationUpgrade = [
@@ -43,15 +46,17 @@ automationUpgrade = [
         cost : 100,
         costMulti : 1.35,
         countIncrease : 10,
-        level : 0
+        level : 0,
+        displaying: false
     },
     {
-        desc: "Auto Fishing + 100/s",
+        desc: "Auto Fishing + 1000/s",
         index: 1,
         cost : 10000,
         costMulti : 1.15,
         countIncrease : 1000,
-        level : 0
+        level : 0,
+        displaying: false
     }
 ];
 let shopUpgrades = [
@@ -62,13 +67,13 @@ let shopUpgrades = [
         bought: false,
     },
     {
-        desc : "Unlock the Buy Max for Fish Collect",
+        desc : "Unlock Buy Max for Fish/Click",
         name : "maxBuyUnlockClick",
         cost : 10000, //10k
         bought: false,
     },
     {
-        desc : "Unlock the Buy Max for Auto Fish",
+        desc : "Unlock Buy Max for Auto Fish",
         name : "maxBuyUnlockAuto",
         cost : 50000, //50k
         bought: false,
@@ -77,8 +82,9 @@ let shopUpgrades = [
 
 let upgradesList = [{type:"fish", data:fishUpgrade, class:"upgradeButton"},
                     {type:"auto", data:automationUpgrade, class:"upgradeButton"},
-                    {type:"feature",data:shopUpgrades, class:"featureButton"}]
+                    {type:"feature", data:shopUpgrades, class:"featureButton"}];
 
+var gameData = [fish, upgradesList, gamestage];
 
 
 //Button handling --------------
@@ -97,14 +103,27 @@ $("#automation").on('click','.upgradeButton',function() {
 $("#homeBttn").click(function(){
     switchMenu(".home");
 });
+const modal = document.getElementById("mainModal");
 $("#shopBttn").click(function(){
-    switchMenu("#shopUpgrades");
-    $("#shopBttn").innerHTML = `<span class="badge"></span>`;
+    //switchMenu("#shopUpgrades");
+    $("#shopBttn").css("background-color", "");
+    modal.style.display = "block";
 });
+
+$("#closeBttn").click(function(){
+    //switchMenu("#shopUpgrades");
+    modal.style.display = "none";
+    $("#shopBttn").css("background-color", "");
+});
+
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
 $("#debugBttn").click(function(){
-     fish.value += 4000;
-     calcBuyMax(fishUpgrade[0]);
-    //$("#shopBttn").prop("disabled", false);
+     fish.value += 1000;
 });
 
 //Feature Unlock Buttons ---------------
@@ -114,7 +133,7 @@ $("#shopUpgrades").on('click', ".featureButton", function(){
     upgrade = upgradesList[getUpgradeListIndex(this.getAttribute("type"))].data[index];
     if (fish.count > upgrade.cost && !upgrade.bought){
         $(this).prop("disabled", true);
-        $(this).css("background-color", "#ffea00");
+        $(this).css("background-color", "#00FF33");
         $(this).css("color", "black");
         fish.count -= upgrade.cost;
         upgrade.bought = true;
@@ -123,10 +142,10 @@ $("#shopUpgrades").on('click', ".featureButton", function(){
                 addUpgrade(0,"auto","#autoUpgrades");
                 break;;
             case "maxBuyUnlockClick":
-                addBuyMax(0);
+                addBuyMax(0,"fish");
                 break;;
             case "maxBuyUnlockAuto":
-                addBuyMax(1);
+                addBuyMax(1,"auto");
                 break;;
             default:
                 console.log("Couldn't find handler");
@@ -135,25 +154,16 @@ $("#shopUpgrades").on('click', ".featureButton", function(){
     updateDisplay();
 });
 
-// function checkButtonUnlock(){
-//     for (let i = 0; i < upgrade.length; i++){
-//         if (upgrade[i].stageReq == )
-//     }
-// }
-
 //WORKING ON THESE FUNCTIONS
 function addBuyMax(index,type){
-    console.log("Buy max for upgrade ", upgrade);
     document.querySelectorAll('#fishUpgrades').forEach(function (button){
-        let newUpgrade = `<button type="${fish}" index="0" class="buyMaxBttn>"`
+        let newUpgrade = `<button type="${type}" index="${index}}" class="buyMaxBttn">`
         newUpgrade += `</button>`
-//<button type="fish" index="0" class="upgradeButton">Fish Collection +1 (<span class="owned">0</span>)<p>Cost: <span class="cost">10</span></p></button>
-
         button.append(newUpgrade);
     });
 
 }
-//Calculate how many I can buy of the passed upgrade
+//Calculate how many upgradescan be bought
 function calcBuyMax(upgrade){
     //t = total cost, c = cost, m = Max upgrades
     let [t,m,c] = [0,0,upgrade.cost];
@@ -176,6 +186,9 @@ function addUpgrade(index,type,id){
     $(id).append( newUpgrade );
 }
 
+function fishUpgradeHandler(upgrade){
+    fish.value += upgrade.countIncrease;
+}
 
 
 // Function to process the purchase of an upgrade
@@ -189,12 +202,12 @@ function upgradeBought(data){
         upgrade.level += 1;
         // Update the cost of the upgrade and display it in the button
         upgrade.cost *= upgrade.costMulti;
-        data.querySelector(".owned").innerHTML = formatNumber(upgrade.level);
+        data.querySelector(".owned").innerHTML = formatNumber(upgrade.level*upgrade.countIncrease);
         data.querySelector(".cost").innerHTML = formatNumber(upgrade.cost);
         //Handle the function of the button
         switch(data.getAttribute('type')){
             case "fish":
-                fish.value += upgrade.countIncrease;
+                fishUpgradeHandler(upgrade);
                 break;;
             case "auto":
                 fish.perSecond += upgrade.countIncrease;
@@ -246,6 +259,7 @@ function buttonCheck(button){
 }
 
 //Format the number as 1k, 1m then 1eX
+//ADD A SWITCH 
 function formatNumber(number) {
     if (number < 1000) {
         return number.toFixed(2).toString(); // No formatting needed for numbers less than 1000
@@ -253,6 +267,8 @@ function formatNumber(number) {
         return (number / 1000).toFixed(2) + 'k'; // Format as 'X.XXk' for thousands
     } else if (number < 1000000000){
         return (number / 1000000).toFixed(2) + 'm'; // Format as 'X.XXm' for millions
+    } else if (number < 1000000000000){
+        return (number / 1000000000).toFixed(2) + 'b'; // Format as 'X.XXb' for billion
     } else {
         return new Decimal(number).toStringWithDecimalPlaces(2);
     }
@@ -270,7 +286,6 @@ function updateDisplay() {
     $("#fishValue").html(formatNumber(fish.value));
     $("#fishPerSec").html(formatNumber(fish.perSecond));
     checkUnlocks();
-    //checkButtonUnlock();
     buttonCheck();
 
 }
@@ -281,10 +296,11 @@ function checkUnlocks(){
     if (fish.lifetime > 2000 && gamestage == 0){
         gamestage++;
         $("#shopBttn").prop("disabled", false);
+        $("#shopBttn").css("background-color", "blue");
         addUpgrade(gamestage-1,"feature","#shopUpgrades");
         const intervalId = setInterval(autoCollect, 500);
     }
-    if (fish.lifetime > 15000 && gamestage == 1){
+    if (fish.lifetime > 5000 && gamestage == 1){
         gamestage++;
         addUpgrade(gamestage-1,"feature","#shopUpgrades");
     }
@@ -301,6 +317,16 @@ function checkUnlocks(){
         addUpgrade(1,"auto","#autoUpgrades");
     }
 }
+
+// var saveGameLoop = window.setInterval(function() {
+//     localStorage.setItem("idleFishingData-IProHarper", JSON.stringify(gameData))
+//   }, 15000);
+
+
+// var savegame = JSON.parse(localStorage.getItem("goldMinerSave"))
+// if (savegame !== null) {
+//   gameData = savegame
+// }
 
 // Function to initialize the game
 function initializeGame() {
