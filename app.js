@@ -13,7 +13,6 @@ let gamestage = 0;
 fishUpgrade = [
     {
         desc: "Fish Collection +1",
-        levelForNext: 10,
         cost : 10,
         costMulti : 1.2,
         countIncrease : 1,
@@ -22,7 +21,6 @@ fishUpgrade = [
     },
     {
         desc: "Fish Collection +10",
-        levelForNext: 10,
         cost : 100,
         costMulti : 1.25,
         countIncrease : 10,
@@ -30,11 +28,18 @@ fishUpgrade = [
         displaying: true
     },
     {
-        desc: "Fish Collection +100k",
-        levelForNext: 10,
-        cost : 10000,
-        costMulti : 1.3,
-        countIncrease : 100000,
+        desc: "Fish Collection +1k",
+        cost : 5000,
+        costMulti : 1.25,
+        countIncrease : 1000,
+        level : 0,
+        displaying: false
+    },
+    {
+        desc: "Fish Collection +50k",
+        cost : 100000,
+        costMulti : 1.25,
+        countIncrease : 50000,
         level : 0,
         displaying: false
     }
@@ -42,19 +47,37 @@ fishUpgrade = [
 automationUpgrade = [
     {
         desc: "Auto Fishing + 10/s",
-        index: 0,
+        //index: 0,
         cost : 100,
-        costMulti : 1.35,
+        costMulti : 1.25,
         countIncrease : 10,
         level : 0,
         displaying: false
     },
     {
-        desc: "Auto Fishing + 10k/s",
-        index: 1,
+        desc: "Auto Fishing + 1k/s",
+        //index: 1,
         cost : 10000,
         costMulti : 1.15,
+        countIncrease : 1000,
+        level : 0,
+        displaying: false
+    },
+    {
+        desc: "Auto Fishing + 10k/s",
+        //index: 2,
+        cost : 100000,
+        costMulti : 1.15,
         countIncrease : 10000,
+        level : 0,
+        displaying: false
+    },
+    {
+        desc: "Auto Fishing + 1m/s",
+        //index: 2,
+        cost : 900000,
+        costMulti : 1.15,
+        countIncrease : 1000000,
         level : 0,
         displaying: false
     }
@@ -63,7 +86,7 @@ let shopUpgrades = [
     {
         desc : "Unlock Auto Fishing",
         name : "autoFishUnlock",
-        cost : 5000, //5k
+        cost : 2500, //5k
         bought: false,
     },
     {
@@ -161,7 +184,6 @@ function addBuyMax(index,type){
         newUpgrade += `</button>`
         button.append(newUpgrade);
     });
-
 }
 //Calculate how many upgradescan be bought
 function calcBuyMax(upgrade){
@@ -191,7 +213,7 @@ function addUpgrade(index,type,id){
     newUpgrade += `${upgrade.desc}`
     newUpgrade += `<button type='${type}' index='${index}' class='${upgradesList[getUpgradeListIndex(type)].class}'>`
     newUpgrade += `Buy`
-    if (type == "fish" || type == "auto"){ newUpgrade += `<p>Increase: <span class="owned">0</span></p>`}
+    if (type == "fish" || type == "auto"){ newUpgrade += `<p>Owned: <span class="owned">0</span></p>`}
     newUpgrade += `<p>Cost: <span class="cost">${formatNumber(upgrade.cost)}</span></p>`
     $(id).append( newUpgrade );
 }
@@ -213,7 +235,7 @@ function upgradeBought(data){
         upgrade.level += 1;
         // Update the cost of the upgrade and display it in the button
         upgrade.cost *= upgrade.costMulti;
-        data.querySelector(".owned").innerHTML = formatNumber(upgrade.level*upgrade.countIncrease);
+        data.querySelector(".owned").innerHTML = formatNumber(upgrade.level);
         data.querySelector(".cost").innerHTML = formatNumber(upgrade.cost);
         //Handle the function of the button
         switch(data.getAttribute('type')){
@@ -313,19 +335,20 @@ function checkUnlocks(){
     }
     if (fish.lifetime > 5000 && gamestage == 1){
         gamestage++;
-        addUpgrade(gamestage-1,"feature","#shopUpgrades");
+        //addUpgrade(gamestage-1,"feature","#shopUpgrades");
     }
-    if (fish.lifetime > 50000 && gamestage == 2){
+    if (fish.lifetime > 20000 && gamestage == 2){
         gamestage++;
-        addUpgrade(gamestage-1,"feature","#shopUpgrades");
+        addUpgrade(2,"fish","#fishUpgrades");
+        //addUpgrade(gamestage-1,"feature","#shopUpgrades");
     }
     if (fish.lifetime > 100000 && gamestage == 3){
         gamestage++;
-        addUpgrade(2,"fish","#fishUpgrades");
+        addUpgrade(1,"auto","#autoUpgrades");
     }
     if (fish.lifetime > 150000 && gamestage == 4 && shopUpgrades[0].bought){
         gamestage++;
-        addUpgrade(1,"auto","#autoUpgrades");
+        addUpgrade(2,"auto","#autoUpgrades");
     }
 }
 
