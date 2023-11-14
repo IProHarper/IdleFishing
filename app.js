@@ -30,7 +30,7 @@ fishUpgrade = [
         displaying: true
     },
     {
-        desc: "Fish Collection +100",
+        desc: "Fish Collection +100k",
         levelForNext: 10,
         cost : 10000,
         costMulti : 1.3,
@@ -50,11 +50,11 @@ automationUpgrade = [
         displaying: false
     },
     {
-        desc: "Auto Fishing + 1000/s",
+        desc: "Auto Fishing + 10k/s",
         index: 1,
         cost : 10000,
         costMulti : 1.15,
-        countIncrease : 1000,
+        countIncrease : 10000,
         level : 0,
         displaying: false
     }
@@ -156,8 +156,8 @@ $("#shopUpgrades").on('click', ".featureButton", function(){
 
 //WORKING ON THESE FUNCTIONS
 function addBuyMax(index,type){
-    document.querySelectorAll('#fishUpgrades').forEach(function (button){
-        let newUpgrade = `<button type="${type}" index="${index}}" class="buyMaxBttn">`
+    document.querySelectorAll(`#${type}Upgrades`).forEach(function (button){
+        let newUpgrade = `<button type="${type}" index="${index}" class="buyMaxBttn">`
         newUpgrade += `</button>`
         button.append(newUpgrade);
     });
@@ -177,14 +177,25 @@ function calcBuyMax(upgrade){
 
 
 //Add Upgrade buttons for automation use
+// function addUpgrade(index,type,id){
+//     upgrade = upgradesList[getUpgradeListIndex(type)].data[index];
+//     newUpgrade = `<button type='${type}' index='${index}' class='${upgradesList[getUpgradeListIndex(type)].class}'>`
+//     newUpgrade += `${upgrade.desc}`
+//     if (type == "fish" || type == "auto"){ newUpgrade += ` (<span class="owned">0</span>)`}
+//     newUpgrade += `<p>Cost: <span class="cost">${formatNumber(upgrade.cost)}</span></p>`
+//     $(id).append( newUpgrade );
+// }
 function addUpgrade(index,type,id){
     upgrade = upgradesList[getUpgradeListIndex(type)].data[index];
-    newUpgrade = `<button type='${type}' index='${index}' class='${upgradesList[getUpgradeListIndex(type)].class}'>`
+    newUpgrade =`<div class="${type}Block">`
     newUpgrade += `${upgrade.desc}`
-    if (type == "fish" || type == "auto"){ newUpgrade += ` (<span class="owned">0</span>)`}
+    newUpgrade += `<button type='${type}' index='${index}' class='${upgradesList[getUpgradeListIndex(type)].class}'>`
+    newUpgrade += `Buy`
+    if (type == "fish" || type == "auto"){ newUpgrade += `<p>Increase: <span class="owned">0</span></p>`}
     newUpgrade += `<p>Cost: <span class="cost">${formatNumber(upgrade.cost)}</span></p>`
     $(id).append( newUpgrade );
 }
+
 
 function fishUpgradeHandler(upgrade){
     fish.value += upgrade.countIncrease;
@@ -330,6 +341,9 @@ function checkUnlocks(){
 
 // Function to initialize the game
 function initializeGame() {
+    //addUpgrade(0,"auto","#autoUpgrades");
+    addUpgrade(0,"fish","#fishUpgrades");
+    addUpgrade(1,"fish","#fishUpgrades");
     updateDisplay();
     $("#pageDisplay").css("display", "block");
     //var time = Date.now();

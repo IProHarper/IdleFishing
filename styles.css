@@ -3,6 +3,8 @@ body {
  font-family: Arial, sans-serif;
  background-color: #f0f0f0;
  text-align: center;
+ height: 100%;
+ width: 100%;
 }
 
 h1 {
@@ -27,7 +29,7 @@ h1 {
 /* Modal Content */
 .modal-content {
  position: relative;
- background-color: #505050;
+ background-color: #f0f0f0;
  margin: auto;
  padding: 0;
  border: 1px solid #888;
@@ -118,18 +120,27 @@ button .badge {
  color: white;
 }
 .upgradeButton {
+ display:block;
+ font-weight: bold;
+ line-height: 0.5em;
  font-size: medium;
+ margin:auto;
+ width: 20%;
+
 }
 .upgradeButton p{
- font-size: small;
+ font-size:small;
+ font-weight: normal;
 }
 .featureButton{
- margin: 5px;
+ margin: auto;
+ width:40%;
+ float:right;
+ font-size: large;
 }
-
 #mainDisplay {
  width: 100%;
- display: table;
+ height:100%;
  align-items: center;
 }
 #statsDisplay {
@@ -138,11 +149,14 @@ button .badge {
 }
 #pageDisplay {
  margin: auto;
- width: 80%;
+ height:100%;
+ width: 100%;
+ overflow: scroll;
 }
 #pageDisplay button{
- width: 80%;
+ width: 40%;
  margin-bottom: 10px;
+ float:right;
 }
 #shopUpgrades{
  width: 60%;
@@ -152,28 +166,77 @@ button .badge {
 }
 
 #upgrades {
- width: 33%;
- display: inline-grid;
- float: left;
- border-right:2px solid#000;
+ width: 49%;
+ height:100%;
+ display: grid;
+ margin-left:auto;
+ float:left;
+ border-right: #000 solid 5px;
+ border-top: #000 solid 5px;
 }
 
 #automation{
- width: 33%;
- height: 100%;
- display: inline-grid;
- float: right;
+ width: 49%;
+ height:100%;
+ display: grid;
+ margin-right:auto;
+ float:right;
+ border-left:#000 solid 5px;
+ border-top: #000 solid 5px;
+
 }
 
 #fishUpgrades {
- display: block;
  width: 80%;
+ margin: auto;
+ display:grid;
+ padding: 10px;
+ font-size: medium;
+
 }
 #autoUpgrades {
- display: block;
  width: 80%;
- margin-bottom: 10px;
+ display:grid;
+ padding: 10px;
+ font-size: medium;
 }
+.fishBlock{
+ display:block;
+ margin-left:auto;
+ margin-bottom: 10px;
+ width:100%;
+ text-align: center;
+ background-color: #459af5;
+ color: #000;
+ padding: 20px;
+ border: 2px solid black;
+}
+.autoBlock{
+ display:block;
+ margin-left:auto;
+ margin-bottom: 10px;
+ width:100%;
+ text-align: center;
+ background-color: #459af5;
+ color: #000;
+ padding: 20px;
+ border: 2px solid black;
+}
+
+.featureBlock{
+ display:block;
+ margin-left:auto;
+ margin-bottom: 10px;
+ font-size: large;
+ width:100%;
+ text-align: center;
+ background-color: #459af5;
+ color: #fff;
+ padding: 20px;
+ border: 2px solid black;
+}
+
+
 
 #menus {
  display: inline;
