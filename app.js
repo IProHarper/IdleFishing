@@ -1,4 +1,7 @@
- $(document).ready(function(){
+// #!/usr/bin/env node
+// var Decimal = require("break_infinity.js");
+// var $ = require('')
+$(document).ready(function(){
 
 //Variables
 //Main currency
@@ -10,7 +13,7 @@ let fish = {
     lifetime: 0
 };
 let gamestage = 0;
-fishUpgrade = [
+let fishUpgrade = [
     {
         desc: "Fish Collection +1",
         cost : 10,
@@ -44,10 +47,9 @@ fishUpgrade = [
         displaying: false
     }
 ];
-automationUpgrade = [
+let automationUpgrade = [
     {
         desc: "Auto Fishing + 10/s",
-        //index: 0,
         cost : 100,
         costMulti : 1.25,
         countIncrease : 10,
@@ -56,7 +58,6 @@ automationUpgrade = [
     },
     {
         desc: "Auto Fishing + 1k/s",
-        //index: 1,
         cost : 10000,
         costMulti : 1.15,
         countIncrease : 1000,
@@ -65,7 +66,6 @@ automationUpgrade = [
     },
     {
         desc: "Auto Fishing + 10k/s",
-        //index: 2,
         cost : 100000,
         costMulti : 1.15,
         countIncrease : 10000,
@@ -74,7 +74,6 @@ automationUpgrade = [
     },
     {
         desc: "Auto Fishing + 1m/s",
-        //index: 2,
         cost : 900000,
         costMulti : 1.15,
         countIncrease : 1000000,
@@ -102,13 +101,48 @@ let shopUpgrades = [
         bought: false,
     }
 ];
-
+let gameStages = [
+    { threshold: 1000, action: unlockStage1 },
+    { threshold: 5000, action: unlockStage2 },
+    { threshold: 20000, action: unlockStage3 },
+    { threshold: 500000, action: unlockStage4 },
+    { threshold: 2000000, action: unlockStage5 }
+];
 let upgradesList = [{type:"fish", data:fishUpgrade, class:"upgradeButton"},
                     {type:"auto", data:automationUpgrade, class:"upgradeButton"},
                     {type:"feature", data:shopUpgrades, class:"featureButton"}];
 
 var gameData = [fish, upgradesList, gamestage];
 
+//GAME PROGRESSION Functions
+//-------------------------------
+//gameStage == 0 in first check
+function unlockStage1 (){
+     $("#shopBttn").prop("disabled", false);
+     $("#shopBttn").css("background-color", "blue");
+     addUpgrade(0, "feature", "#shopUpgrades");
+     const intervalId = setInterval(autoCollect, 500);
+     gamestage++;
+    }
+function unlockStage2 (){
+    if (shopUpgrades[0].bought){
+        addUpgrade(1,"auto","#autoUpgrades");
+        gamestage++;
+    }
+    }
+function unlockStage3 (){
+    addUpgrade(2,"fish","#fishUpgrades");
+    gamestage++;
+    }    
+function unlockStage4 (){
+    addUpgrade(2,"auto","#autoUpgrades");
+    gamestage++;
+    } 
+function unlockStage5 (){
+    addUpgrade(3,"auto","#autoUpgrades");
+    gamestage++;
+    } 
+//-------------------------------
 
 //Button handling --------------
 // Function to collect fish
@@ -153,7 +187,7 @@ $("#debugBttn").click(function(){
 $("#shopUpgrades").on('click', ".featureButton", function(){
     //Take money away and stuff
     let index = this.getAttribute("index");
-    upgrade = upgradesList[getUpgradeListIndex(this.getAttribute("type"))].data[index];
+    let upgrade = upgradesList[getUpgradeListIndex(this.getAttribute("type"))].data[index];
     if (fish.count > upgrade.cost && !upgrade.bought){
         $(this).prop("disabled", true);
         $(this).css("background-color", "#00FF33");
@@ -208,8 +242,8 @@ function calcBuyMax(upgrade){
 //     $(id).append( newUpgrade );
 // }
 function addUpgrade(index,type,id){
-    upgrade = upgradesList[getUpgradeListIndex(type)].data[index];
-    newUpgrade =`<div class="${type}Block">`
+    let upgrade = upgradesList[getUpgradeListIndex(type)].data[index];
+    let newUpgrade =`<div class="${type}Block">`
     newUpgrade += `${upgrade.desc}`
     newUpgrade += `<button type='${type}' index='${index}' class='${upgradesList[getUpgradeListIndex(type)].class}'>`
     newUpgrade += `Buy`
@@ -228,7 +262,7 @@ function fishUpgradeHandler(upgrade){
 function upgradeBought(data){
     // Get the index and type of the clicked button
     let index = data.getAttribute('index');
-    upgrade = upgradesList[getUpgradeListIndex(data.getAttribute('type'))].data[index];
+    let upgrade = upgradesList[getUpgradeListIndex(data.getAttribute('type'))].data[index];
     // Check if the player has enough fish to purchase the upgrade
     if (fish.count >= upgrade.cost) {
         fish.count -= upgrade.cost;
@@ -255,6 +289,7 @@ function upgradeBought(data){
 
 function autoCollect(){
     fish.count += fish.perSecond / 2;
+    fish.lifetime += fish.perSecond / 2;
     updateDisplay();
 }
 
@@ -318,39 +353,21 @@ function updateDisplay() {
     $("#fishCount").html(formatNumber(fish.count));
     $("#fishValue").html(formatNumber(fish.value));
     $("#fishPerSec").html(formatNumber(fish.perSecond));
+    $("#fishlifetime").html(formatNumber(fish.lifetime));
     checkUnlocks();
     buttonCheck();
-
 }
 
 //Progressive unlocks.
-//TODO Clean up.
 function checkUnlocks(){
-    if (fish.lifetime > 2000 && gamestage == 0){
-        gamestage++;
-        $("#shopBttn").prop("disabled", false);
-        $("#shopBttn").css("background-color", "blue");
-        addUpgrade(gamestage-1,"feature","#shopUpgrades");
-        const intervalId = setInterval(autoCollect, 500);
+        for (let stage of gameStages) { 
+            const index = gameStages.findIndex((s) => s === stage);
+            if (fish.lifetime > stage.threshold && gamestage === index) {
+                stage.action();
+            }
+        }
     }
-    if (fish.lifetime > 5000 && gamestage == 1){
-        gamestage++;
-        //addUpgrade(gamestage-1,"feature","#shopUpgrades");
-    }
-    if (fish.lifetime > 20000 && gamestage == 2){
-        gamestage++;
-        addUpgrade(2,"fish","#fishUpgrades");
-        //addUpgrade(gamestage-1,"feature","#shopUpgrades");
-    }
-    if (fish.lifetime > 100000 && gamestage == 3){
-        gamestage++;
-        addUpgrade(1,"auto","#autoUpgrades");
-    }
-    if (fish.lifetime > 150000 && gamestage == 4 && shopUpgrades[0].bought){
-        gamestage++;
-        addUpgrade(2,"auto","#autoUpgrades");
-    }
-}
+
 
 // var saveGameLoop = window.setInterval(function() {
 //     localStorage.setItem("idleFishingData-IProHarper", JSON.stringify(gameData))
