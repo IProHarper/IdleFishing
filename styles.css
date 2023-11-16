@@ -151,7 +151,7 @@ button .badge {
  margin: auto;
  height:100%;
  width: 100%;
- overflow: scroll;
+ overflow: auto;
 }
 #pageDisplay button{
  width: 40%;

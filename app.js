@@ -1,6 +1,6 @@
-// #!/usr/bin/env node
-// var Decimal = require("break_infinity.js");
-// var $ = require('')
+#!/usr/bin/env node
+var Decimal = require("break_infinity.js");
+
 $(document).ready(function(){
 
 //Variables
@@ -85,7 +85,13 @@ let shopUpgrades = [
     {
         desc : "Unlock Auto Fishing",
         name : "autoFishUnlock",
-        cost : 2500, //5k
+        cost : 2500, //2.5k
+        bought: false,
+    },
+    {
+        desc : "Unlock Fish Multi",
+        name : "multiUnlock",
+        cost : 1000000000, //1b
         bought: false,
     },
     {
@@ -103,10 +109,11 @@ let shopUpgrades = [
 ];
 let gameStages = [
     { threshold: 1000, action: unlockStage1 },
-    { threshold: 5000, action: unlockStage2 },
-    { threshold: 20000, action: unlockStage3 },
-    { threshold: 500000, action: unlockStage4 },
-    { threshold: 2000000, action: unlockStage5 }
+    { threshold: 5000, action: unlockStage2 },//5k
+    { threshold: 20000, action: unlockNewBttn, vars: {type:"fish", index:2} },//20k
+    { threshold: 500000, action: unlockNewBttn, vars: {type:"auto", index:2} },//500k
+    { threshold: 2000000, action: unlockNewBttn, vars: {type:"fish", index:3} },//2m
+    { threshold: 100000000, action: unlockNewBttn, vars: {type:"fish", index:3} }//100m
 ];
 let upgradesList = [{type:"fish", data:fishUpgrade, class:"upgradeButton"},
                     {type:"auto", data:automationUpgrade, class:"upgradeButton"},
@@ -130,8 +137,8 @@ function unlockStage2 (){
         gamestage++;
     }
     }
-function unlockStage3 (){
-    addUpgrade(2,"fish","#fishUpgrades");
+function unlockNewBttn (index,type){
+    addUpgrade(index,type,`#${type}Upgrades`);
     gamestage++;
     }    
 function unlockStage4 (){
@@ -139,6 +146,10 @@ function unlockStage4 (){
     gamestage++;
     } 
 function unlockStage5 (){
+    addUpgrade(3,"fish","#fishUpgrades");
+    gamestage++;
+    } 
+function unlockStage6 (){
     addUpgrade(3,"auto","#autoUpgrades");
     gamestage++;
     } 
@@ -205,7 +216,7 @@ $("#shopUpgrades").on('click', ".featureButton", function(){
                 addBuyMax(1,"auto");
                 break;;
             default:
-                console.log("Couldn't find handler");
+                alert("Couldn't find handler");
         }
     }
     updateDisplay();
@@ -363,15 +374,16 @@ function checkUnlocks(){
         for (let stage of gameStages) { 
             const index = gameStages.findIndex((s) => s === stage);
             if (fish.lifetime > stage.threshold && gamestage === index) {
-                stage.action();
+                if (stage.vars){ stage.action(stage.vars.index,stage.vars.type);}
+                else { stage.action(); }
             }
         }
     }
 
 
-// var saveGameLoop = window.setInterval(function() {
-//     localStorage.setItem("idleFishingData-IProHarper", JSON.stringify(gameData))
-//   }, 15000);
+var saveGameLoop = window.setInterval(function() {
+    localStorage.setItem("idleFishingData-IProHarper", JSON.stringify(gameData))
+  }, 15000);
 
 
 // var savegame = JSON.parse(localStorage.getItem("goldMinerSave"))
