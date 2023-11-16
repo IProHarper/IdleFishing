@@ -138,6 +138,10 @@ button .badge {
  float:right;
  font-size: large;
 }
+#ResetBttn {
+ float: right;
+ background-color: Red;
+}
 #mainDisplay {
  width: 100%;
  height:100%;

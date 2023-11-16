@@ -86,7 +86,13 @@ let shopUpgrades = [
     {
         desc : "Unlock Auto Fishing",
         name : "autoFishUnlock",
-        cost : 2500, //5k
+        cost : 2500, //2.5k
+        bought: false,
+    },
+    {
+        desc : "Unlock Fish Multi",
+        name : "multiUnlock",
+        cost : 1000000000, //1b
         bought: false,
     },
     {
@@ -108,13 +114,14 @@ let gameStages = [
     { threshold: 20000, action: unlockNewBttn, vars: {type:"fish", index:2} },//20k
     { threshold: 500000, action: unlockNewBttn, vars: {type:"auto", index:2} },//500k
     { threshold: 2000000, action: unlockNewBttn, vars: {type:"fish", index:3} },//2m
-    { threshold: 100000000, action: unlockNewBttn, vars: {type:"fish", index:3} }//100m
+    { threshold: 100000000, action: unlockNewBttn, vars: {type:"fish", index:3} },//100m
+    { threshold: 500000000, action: unlockStage3, vars: {type:"feature", index:1} }//500m
 ];
 let upgradesList = [{type:"fish", data:fishUpgrade, class:"upgradeButton"},
                     {type:"auto", data:automationUpgrade, class:"upgradeButton"},
                     {type:"feature", data:shopUpgrades, class:"featureButton"}];
 
-var gameData = [fish, upgradesList, gamestage];
+var gameData = {fish, upgradesList, gamestage};
 
 //GAME PROGRESSION Functions
 //-------------------------------
@@ -124,38 +131,37 @@ function unlockStage1 (){
      $("#shopBttn").css("background-color", "blue");
      addUpgrade(0, "feature", "#shopUpgrades");
      const intervalId = setInterval(autoCollect, 500);
-     gamestage++;
+     gameData.gamestage++;
     }
 function unlockStage2 (){
-    if (shopUpgrades[0].bought){
+    if (gameData.upgradesList[getUpgradeListIndex("feature")].data[0].bought){
         addUpgrade(1,"auto","#autoUpgrades");
-        gamestage++;
+        gameData.gamestage++;
     }
     }
 function unlockNewBttn (index,type){
     addUpgrade(index,type,`#${type}Upgrades`);
-    console.log("UnlockButtons")
-    gamestage++;
+    gameData.gamestage++;
     }    
-function unlockStage4 (){
-    addUpgrade(2,"auto","#autoUpgrades");
-    gamestage++;
+function unlockStage3 (){
+    addUpgrade(1, "feature", "#shopUpgrades");
+    gameData.gamestage++;
     } 
 function unlockStage5 (){
     addUpgrade(3,"fish","#fishUpgrades");
-    gamestage++;
+    gameData.gamestage++;
     } 
 function unlockStage6 (){
     addUpgrade(3,"auto","#autoUpgrades");
-    gamestage++;
+    gameData.gamestage++;
     } 
 //-------------------------------
 
 //Button handling --------------
 // Function to collect fish
 $("#collectFish").click(function() {
-    fish.count += fish.value * fish.multi;
-    fish.lifetime += fish.value * fish.multi
+    gameData.fish.count += gameData.fish.value * gameData.fish.multi;
+    gameData.fish.lifetime += gameData.fish.value * gameData.fish.multi
     updateDisplay();
 });
 $("#upgrades").on('click','.upgradeButton',function() {
@@ -166,6 +172,14 @@ $("#automation").on('click','.upgradeButton',function() {
 });
 $("#homeBttn").click(function(){
     switchMenu(".home");
+});
+$("#ResetBttn").click(function(){
+    if (confirm("Warning! You are about to Reset all progress and start from 0.\nAre you sure you wish to continue?")){
+        fetch("./initData.json")
+        .then(response => response.json())
+        .then(json => gameData = json);
+        setTimeout(() => updateDisplay(), 500);
+        }    
 });
 const modal = document.getElementById("mainModal");
 $("#shopBttn").click(function(){
@@ -187,19 +201,19 @@ window.onclick = function(event) {
 }
 
 $("#debugBttn").click(function(){
-     fish.value += 1000;
+    gameData.fish.value += 1000;
 });
 
 //Feature Unlock Buttons ---------------
 $("#shopUpgrades").on('click', ".featureButton", function(){
     //Take money away and stuff
     let index = this.getAttribute("index");
-    let upgrade = upgradesList[getUpgradeListIndex(this.getAttribute("type"))].data[index];
-    if (fish.count > upgrade.cost && !upgrade.bought){
+    let upgrade = gameData.upgradesList[getUpgradeListIndex(this.getAttribute("type"))].data[index];
+    if (gameData.fish.count > upgrade.cost && !upgrade.bought){
         $(this).prop("disabled", true);
         $(this).css("background-color", "#00FF33");
         $(this).css("color", "black");
-        fish.count -= upgrade.cost;
+        gameData.fish.count -= upgrade.cost;
         upgrade.bought = true;
         switch (upgrade.name){
             case "autoFishUnlock":
@@ -212,7 +226,7 @@ $("#shopUpgrades").on('click', ".featureButton", function(){
                 addBuyMax(1,"auto");
                 break;;
             default:
-                console.log("Couldn't find handler");
+                alert("Couldn't find handler");
         }
     }
     updateDisplay();
@@ -230,7 +244,7 @@ function addBuyMax(index,type){
 function calcBuyMax(upgrade){
     //t = total cost, c = cost, m = Max upgrades
     let [t,m,c] = [0,0,upgrade.cost];
-    while (t + c <= fish.count) {
+    while (t + c <= gameData.fish.count) {
         t += c;
         c *= upgrade.costMulti;
         m++;
@@ -239,18 +253,8 @@ function calcBuyMax(upgrade){
 }
 
 
-//Add Upgrade buttons for automation use
-// function addUpgrade(index,type,id){
-//     upgrade = upgradesList[getUpgradeListIndex(type)].data[index];
-//     newUpgrade = `<button type='${type}' index='${index}' class='${upgradesList[getUpgradeListIndex(type)].class}'>`
-//     newUpgrade += `${upgrade.desc}`
-//     if (type == "fish" || type == "auto"){ newUpgrade += ` (<span class="owned">0</span>)`}
-//     newUpgrade += `<p>Cost: <span class="cost">${formatNumber(upgrade.cost)}</span></p>`
-//     $(id).append( newUpgrade );
-// }
 function addUpgrade(index,type,id){
-    console.log("Adding upgrade", index, type, id);
-    let upgrade = upgradesList[getUpgradeListIndex(type)].data[index];
+    let upgrade = gameData.upgradesList[getUpgradeListIndex(type)].data[index];
     let newUpgrade =`<div class="${type}Block">`
     newUpgrade += `${upgrade.desc}`
     newUpgrade += `<button type='${type}' index='${index}' class='${upgradesList[getUpgradeListIndex(type)].class}'>`
@@ -262,7 +266,7 @@ function addUpgrade(index,type,id){
 
 
 function fishUpgradeHandler(upgrade){
-    fish.value += upgrade.countIncrease;
+    gameData.fish.value += upgrade.countIncrease;
 }
 
 
@@ -270,10 +274,10 @@ function fishUpgradeHandler(upgrade){
 function upgradeBought(data){
     // Get the index and type of the clicked button
     let index = data.getAttribute('index');
-    let upgrade = upgradesList[getUpgradeListIndex(data.getAttribute('type'))].data[index];
+    let upgrade = gameData.upgradesList[getUpgradeListIndex(data.getAttribute('type'))].data[index];
     // Check if the player has enough fish to purchase the upgrade
-    if (fish.count >= upgrade.cost) {
-        fish.count -= upgrade.cost;
+    if (gameData.fish.count >= upgrade.cost) {
+        gameData.fish.count -= upgrade.cost;
         upgrade.level += 1;
         // Update the cost of the upgrade and display it in the button
         upgrade.cost *= upgrade.costMulti;
@@ -285,7 +289,7 @@ function upgradeBought(data){
                 fishUpgradeHandler(upgrade);
                 break;;
             case "auto":
-                fish.perSecond += upgrade.countIncrease;
+                gameData.fish.perSecond += upgrade.countIncrease;
                 break;;
             default:
                 console.log("No handler for upgrade type");
@@ -296,15 +300,15 @@ function upgradeBought(data){
 }
 
 function autoCollect(){
-    fish.count += fish.perSecond / 2;
-    fish.lifetime += fish.perSecond / 2;
+    gameData.fish.count += gameData.fish.perSecond / 2;
+    gameData.fish.lifetime += gameData.fish.perSecond / 2;
     updateDisplay();
 }
 
 //Function to return the index of the upgrade types
 function getUpgradeListIndex(type){
-    for (let i = 0; i < upgradesList.length; i++){
-        if (upgradesList[i].type == type){
+    for (i in gameData.upgradesList){
+        if (gameData.upgradesList[i].type == type){
             return (i)
         }
     }
@@ -315,8 +319,8 @@ function buttonCheck(button){
     document.querySelectorAll('.upgradeButton').forEach(function (button){
         // Disable the button if the player doesn't have enough fish to buy the upgrade
             let listIndex = getUpgradeListIndex(button.getAttribute("type"));
-            let cost = upgradesList[listIndex].data[button.getAttribute("index")].cost;
-                if (fish.count < cost) {
+            let cost = gameData.upgradesList[listIndex].data[button.getAttribute("index")].cost;
+                if (gameData.fish.count < cost) {
                     button.disabled = true;
                   } else {
                     button.disabled = false;
@@ -325,8 +329,8 @@ function buttonCheck(button){
     document.querySelectorAll('.featureButton').forEach(function (button){
        // Disable the button if the player doesn't have enough fish to buy the upgrade
        let listIndex = getUpgradeListIndex(button.getAttribute("type"));
-       let cost = upgradesList[listIndex].data[button.getAttribute("index")].cost;
-           if (fish.count < cost) {
+       let cost = gameData.upgradesList[listIndex].data[button.getAttribute("index")].cost;
+           if (gameData.fish.count < cost) {
                button.disabled = true;
              } else {
                button.disabled = false;
@@ -358,10 +362,10 @@ function switchMenu(menu){
 
 // Function to update the display
 function updateDisplay() {
-    $("#fishCount").html(formatNumber(fish.count));
-    $("#fishValue").html(formatNumber(fish.value));
-    $("#fishPerSec").html(formatNumber(fish.perSecond));
-    $("#fishlifetime").html(formatNumber(fish.lifetime));
+    $("#fishCount").html(formatNumber(gameData.fish.count));
+    $("#fishValue").html(formatNumber(gameData.fish.value));
+    $("#fishPerSec").html(formatNumber(gameData.fish.perSecond));
+    $("#fishlifetime").html(formatNumber(gameData.fish.lifetime));
     checkUnlocks();
     buttonCheck();
 }
@@ -370,27 +374,33 @@ function updateDisplay() {
 function checkUnlocks(){
         for (let stage of gameStages) { 
             const index = gameStages.findIndex((s) => s === stage);
-            if (fish.lifetime > stage.threshold && gamestage === index) {
+            if (gameData.fish.lifetime > stage.threshold && gameData.gamestage === index) {
                 if (stage.vars){ stage.action(stage.vars.index,stage.vars.type);}
                 else { stage.action(); }
             }
         }
     }
+function checkSaveFile(){
+    if (localStorage.getItem("idleFishingData-IProHarper")){
+        let data = JSON.parse(localStorage.getItem("idleFishingData-IProHarper"));
+        loadSaveFile(data);
+    }
+}
 
+function loadSaveFile(data){
+    gameData = data;
+    gameData.gamestage = 0;
+    updateDisplay();
+}
 
 var saveGameLoop = window.setInterval(function() {
     localStorage.setItem("idleFishingData-IProHarper", JSON.stringify(gameData))
   }, 15000);
 
 
-// var savegame = JSON.parse(localStorage.getItem("goldMinerSave"))
-// if (savegame !== null) {
-//   gameData = savegame
-// }
-
 // Function to initialize the game
 function initializeGame() {
-    //addUpgrade(0,"auto","#autoUpgrades");
+    checkSaveFile();
     addUpgrade(0,"fish","#fishUpgrades");
     addUpgrade(1,"fish","#fishUpgrades");
     updateDisplay();
