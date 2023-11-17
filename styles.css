@@ -122,7 +122,7 @@ button .badge {
 .upgradeButton {
  display:block;
  font-weight: bold;
- line-height: 0.5em;
+ line-height: 0.25em;
  font-size: medium;
  margin:auto;
  width: 20%;
@@ -239,8 +239,22 @@ button .badge {
  padding: 20px;
  border: 2px solid black;
 }
+#savePopup {
+ opacity: 0;
+ transition: opacity 0.5s;
+ position: fixed;
+ top: 10px;
+ right: 10px;
+ background-color: #4CAF50;
+ color: white;
+ padding: 10px;
+ border-radius: 5px;
+ font-size: 14px;
+}
 
-
+#savePopup.show {
+ opacity: 1;
+}
 
 #menus {
  display: inline;
