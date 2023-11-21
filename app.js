@@ -1,12 +1,6 @@
 #!/usr/bin/env node
 var Decimal = require("break_infinity.js");
-
 var gameData;
-// fetch("./initData.json")
-//     .then(response => response.json())
-//     .then(initjson => initjson);
-//     gameData = initjson;
-// console.log(gameData);  
 
 $(document).ready(function(){
 
@@ -121,14 +115,9 @@ let gameStages = [
     { threshold: 20000, action: unlockNewBttn, vars: {type:"fish", index:2} },//20k
     { threshold: 500000, action: unlockNewBttn, vars: {type:"auto", index:2} },//500k
     { threshold: 2000000, action: unlockNewBttn, vars: {type:"fish", index:3} },//2m
-    { threshold: 100000000, action: unlockNewBttn, vars: {type:"fish", index:3} },//100m
+    { threshold: 100000000, action: unlockNewBttn, vars: {type:"auto", index:3} },//100m
     { threshold: 500000000, action: unlockStage3, vars: {type:"feature", index:1} }//500m
 ];
-// let upgradesList = [{type:"fish", data:fishUpgrade, class:"upgradeButton"},
-//                     {type:"auto", data:automationUpgrade, class:"upgradeButton"},
-//                     {type:"feature", data:shopUpgrades, class:"featureButton"}];
-
-// var gameData = {fish, upgradesList, gamestage};
 
 //GAME PROGRESSION Functions
 //-------------------------------
@@ -264,23 +253,26 @@ function calcBuyMax(upgrade){
     return (m,t);
 }
 
-
+//Add upgrade buttons from the upgradesList
 function addUpgrade(index,type,id){
     let upgrade = gameData.upgradesList[getUpgradeListIndex(type)].data[index];
     let newUpgrade =`<div class="${type}Block">`
     newUpgrade += `${upgrade.desc}`
     newUpgrade += `<button type='${type}' index='${index}' class='${gameData.upgradesList[getUpgradeListIndex(type)].class}'>`
-    newUpgrade += `Buy`
-    if (type == "fish" || type == "auto"){ newUpgrade += `<p>Owned: <span class="owned">0</span></p>`}
+    //newUpgrade += `Buy`
     newUpgrade += `<p>Cost: <span class="cost">${formatNumber(upgrade.cost)}</span></p>`
+    if (type == "fish" || type == "auto"){ newUpgrade += `<p>Owned: <span class="owned">0</span></p>`}
     $(id).append( newUpgrade );
 }
 
-
+//For Fish upgrades simply increase click value
 function fishUpgradeHandler(upgrade){
     gameData.fish.value += upgrade.countIncrease;
 }
-
+//For Fish upgrades simply increase click value
+function autoUpgradeHandler(upgrade){
+    gameData.fish.perSecond += upgrade.countIncrease;
+}
 
 // Function to process the purchase of an upgrade
 function upgradeBought(data){
@@ -301,7 +293,7 @@ function upgradeBought(data){
                 fishUpgradeHandler(upgrade);
                 break;;
             case "auto":
-                gameData.fish.perSecond += upgrade.countIncrease;
+                autoUpgradeHandler(upgrade);
                 break;;
             default:
                 console.log("No handler for upgrade type");
@@ -341,7 +333,7 @@ function formatNumber(number) {
     } else if (number < 1000000000000){
         return (number / 1000000000).toFixed(2) + 'b'; // Format as 'X.XXb' for billion
     } else {
-        return new Decimal(number).toStringWithDecimalPlaces(2);
+        return new Decimal(number).toStringWithDecimalPlaces(2); // Format as X.eX for exponential.
     }
 }
 
@@ -367,18 +359,33 @@ function buttonCheck(button){
     document.querySelectorAll('.featureButton').forEach(function (button){
        // Disable the button if the player doesn't have enough fish to buy the upgrade
        //Handle bought buttons
-       let listIndex = getUpgradeListIndex(button.getAttribute("type"));
+       let index = button.getAttribute("index");
+       let upgrade = gameData.upgradesList[getUpgradeListIndex(button.getAttribute("type"))].data[index];
+       let cost = upgrade.cost;
 
-       if (gameData.upgradesList[listIndex].data[button.getAttribute("index")].bought) {
-            button.disabled = false;
-        }   
-       let cost = gameData.upgradesList[listIndex].data[button.getAttribute("index")].cost;
-           if (gameData.fish.count < cost) {
+        if (gameData.fish.count < cost && !upgrade.disabled) {
                button.disabled = true;
              } else {
                button.disabled = false;
              }
     });
+}
+
+function initializeButtons(){
+    document.querySelectorAll('.featureButton').forEach(function (button){
+        // Disable the button if the player doesn't have enough fish to buy the upgrade
+        //Handle bought buttons
+        let index = button.getAttribute("index");
+        let upgrade = gameData.upgradesList[getUpgradeListIndex(button.getAttribute("type"))].data[index];
+        button.querySelector(".owned").innerHTML = formatNumber(upgrade.level);
+        button.querySelector(".cost").innerHTML = formatNumber(upgrade.cost);
+
+        if (upgrade.bought && button.disabled) {
+            console.log(upgrade, upgrade.bought, button.disabled);
+            button.disabled = true;
+            shopBttnHandling(upgrade.name);
+        }
+     });
 }
 
 
@@ -413,6 +420,7 @@ function initializeGame() {
       checkSaveFile();
       addUpgrade(0,"fish","#fishUpgrades");
       addUpgrade(1,"fish","#fishUpgrades");
+      initializeButtons();
       updateDisplay();
     })
     .catch(error => {

@@ -123,6 +123,7 @@ button .badge {
  display:block;
  font-weight: bold;
  line-height: 0.25em;
+ padding-top:5px;
  font-size: medium;
  margin:auto;
  width: 20%;
@@ -155,11 +156,10 @@ button .badge {
  margin: auto;
  height:100%;
  width: 100%;
- overflow: auto;
+ overflow: hidden;
 }
 #pageDisplay button{
  width: 40%;
- margin-bottom: 10px;
  float:right;
 }
 #shopUpgrades{
@@ -200,6 +200,7 @@ button .badge {
 }
 #autoUpgrades {
  width: 80%;
+ margin: auto;
  display:grid;
  padding: 10px;
  font-size: medium;
@@ -208,22 +209,22 @@ button .badge {
  display:block;
  margin-left:auto;
  margin-bottom: 10px;
- width:100%;
+ width:80%;
  text-align: center;
  background-color: #459af5;
  color: #000;
- padding: 20px;
+ padding: 5px;
  border: 2px solid black;
 }
 .autoBlock{
  display:block;
  margin-left:auto;
  margin-bottom: 10px;
- width:100%;
+ width:80%;
  text-align: center;
  background-color: #459af5;
  color: #000;
- padding: 20px;
+ padding: 5px;
  border: 2px solid black;
 }
 
@@ -232,11 +233,11 @@ button .badge {
  margin-left:auto;
  margin-bottom: 10px;
  font-size: large;
- width:100%;
+ width:80%;
  text-align: center;
  background-color: #459af5;
  color: #fff;
- padding: 20px;
+ padding: 5px;
  border: 2px solid black;
 }
 #savePopup {
