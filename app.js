@@ -161,10 +161,10 @@ $("#collectFish").click(function() {
     updateDisplay();
 });
 $("#upgrades").on('click','.upgradeButton',function() {
-    upgradeBought(this);
+    upgradeBought(this.closest('div'));
 });
 $("#automation").on('click','.upgradeButton',function() {
-    upgradeBought(this);
+    upgradeBought(this.closest('div'));
 });
 $("#homeBttn").click(function(){
     switchMenu(".home");
@@ -258,10 +258,9 @@ function addUpgrade(index,type,id){
     let upgrade = gameData.upgradesList[getUpgradeListIndex(type)].data[index];
     let newUpgrade =`<div class="${type}Block">`
     newUpgrade += `${upgrade.desc}`
+    if (type == "fish" || type == "auto"){ newUpgrade += `: [<span class="owned">0</span>]`}
     newUpgrade += `<button type='${type}' index='${index}' class='${gameData.upgradesList[getUpgradeListIndex(type)].class}'>`
-    //newUpgrade += `Buy`
     newUpgrade += `<p>Cost: <span class="cost">${formatNumber(upgrade.cost)}</span></p>`
-    if (type == "fish" || type == "auto"){ newUpgrade += `<p>Owned: <span class="owned">0</span></p>`}
     $(id).append( newUpgrade );
 }
 
@@ -275,20 +274,23 @@ function autoUpgradeHandler(upgrade){
 }
 
 // Function to process the purchase of an upgrade
-function upgradeBought(data){
+function upgradeBought(element){
+    const button = element.querySelector('button');
     // Get the index and type of the clicked button
-    let index = data.getAttribute('index');
-    let upgrade = gameData.upgradesList[getUpgradeListIndex(data.getAttribute('type'))].data[index];
+    const index = button.getAttribute('index');
+    const type = button.getAttribute('type');
+
+    let upgrade = gameData.upgradesList[getUpgradeListIndex(type)].data[index];
     // Check if the player has enough fish to purchase the upgrade
     if (gameData.fish.count >= upgrade.cost) {
         gameData.fish.count -= upgrade.cost;
         upgrade.level += 1;
         // Update the cost of the upgrade and display it in the button
         upgrade.cost *= upgrade.costMulti;
-        data.querySelector(".owned").innerHTML = formatNumber(upgrade.level);
-        data.querySelector(".cost").innerHTML = formatNumber(upgrade.cost);
+        element.querySelector(".owned").innerHTML = formatNumber(upgrade.level);
+        button.querySelector(".cost").innerHTML = formatNumber(upgrade.cost);
         //Handle the function of the button
-        switch(data.getAttribute('type')){
+        switch(type){
             case "fish":
                 fishUpgradeHandler(upgrade);
                 break;;
@@ -348,9 +350,9 @@ function buttonCheck(button){
     document.querySelectorAll('.upgradeButton').forEach(function (button){
         // Disable the button if the player doesn't have enough fish to buy the upgrade
         let listIndex = getUpgradeListIndex(button.getAttribute("type"));
-        let cost = gameData.upgradesList[listIndex].data[button.getAttribute("index")].cost;
-
-            if (gameData.fish.count < cost) {
+        const upgrade = gameData.upgradesList[listIndex].data[button.getAttribute("index")]
+        button.closest('div').querySelector(".owned").innerHTML = formatNumber(upgrade.level);
+            if (gameData.fish.count < upgrade.cost) {
                 button.disabled = true;
                 } else {
                 button.disabled = false;
