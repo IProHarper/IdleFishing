@@ -166,7 +166,8 @@ button .badge {
 #shopUpgrades{
  width: 60%;
  margin: auto;
- display:grid;
+ display:flex;
+ flex-direction: column;
  padding: 10px;
 }
 

@@ -257,8 +257,9 @@ function calcBuyMax(upgrade){
 //Add upgrade buttons from the upgradesList
 function addUpgrade(index,type,id){
     let upgrade = gameData.upgradesList[getUpgradeListIndex(type)].data[index];
-    let newUpgrade =`<div class="${type}Block">`
-    newUpgrade += `${upgrade.desc}`
+    let newUpgrade =`<div class="${type}Block">`;
+    newUpgrade += `${upgrade.desc}`;
+    if (upgrade.countIncrease) { newUpgrade += `${formatNumber(upgrade.countIncrease)}` };
     if (type == "fish" || type == "auto"){ newUpgrade += `: [<span class="owned">0</span>]`}
     newUpgrade += `<button type='${type}' index='${index}' class='${gameData.upgradesList[getUpgradeListIndex(type)].class}'>`
     newUpgrade += `<p>Cost: <span class="cost">${formatNumber(upgrade.cost)}</span></p>`
@@ -350,7 +351,7 @@ function switchMenu(menu){
 function buttonCheck(button){
     document.querySelectorAll('.upgradeButton').forEach(function (button){
         // Disable the button if the player doesn't have enough fish to buy the upgrade
-        let listIndex = getUpgradeListIndex(button.getAttribute("type"));
+        const listIndex = getUpgradeListIndex(button.getAttribute("type"));
         const upgrade = gameData.upgradesList[listIndex].data[button.getAttribute("index")]
         button.closest('div').querySelector(".owned").innerHTML = formatNumber(upgrade.level);
             if (gameData.fish.count < upgrade.cost) {
@@ -362,10 +363,9 @@ function buttonCheck(button){
     document.querySelectorAll('.featureButton').forEach(function (button){
        // Disable the button if the player doesn't have enough fish to buy the upgrade
        //Handle bought buttons
-       let index = button.getAttribute("index");
-       let upgrade = gameData.upgradesList[getUpgradeListIndex(button.getAttribute("type"))].data[index];
-       let cost = upgrade.cost;
-
+       const index = button.getAttribute("index");
+       const upgrade = gameData.upgradesList[getUpgradeListIndex(button.getAttribute("type"))].data[index];
+       const cost = upgrade.cost;
         if (gameData.fish.count < cost && !upgrade.disabled) {
                button.disabled = true;
              } else {
@@ -374,17 +374,15 @@ function buttonCheck(button){
     });
 }
 
+//LOGIC IS SLIGHTLY WRONG. BUTTONS ALL UNLOCK THEN THE SHOP IS CHECKED
 function initializeButtons(){
+    checkUnlocks();
     document.querySelectorAll('.featureButton').forEach(function (button){
         // Disable the button if the player doesn't have enough fish to buy the upgrade
         //Handle bought buttons
-        let index = button.getAttribute("index");
+        const index = button.getAttribute("index");
         let upgrade = gameData.upgradesList[getUpgradeListIndex(button.getAttribute("type"))].data[index];
-        button.querySelector(".owned").innerHTML = formatNumber(upgrade.level);
-        button.querySelector(".cost").innerHTML = formatNumber(upgrade.cost);
-
-        if (upgrade.bought && button.disabled) {
-            console.log(upgrade, upgrade.bought, button.disabled);
+        if (upgrade.bought && !button.disabled) {
             button.disabled = true;
             shopBttnHandling(upgrade.name);
         }
