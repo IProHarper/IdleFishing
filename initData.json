@@ -8,7 +8,7 @@
  },
  "upgradesList":[{"type":"fish", "data":[
                             {
-                                "desc": "Fish/Click + ",
+                                "desc": "+ ",
                                 "cost" : 10,
                                 "costMulti" : 1.2,
                                 "countIncrease" : 1,
@@ -16,7 +16,7 @@
                                 "displaying": true
                             },
                             {
-                                "desc": "Fish/Click + ",
+                                "desc": "+ ",
                                 "cost" : 100,
                                 "costMulti" : 1.25,
                                 "countIncrease" : 10,
@@ -24,7 +24,7 @@
                                 "displaying": true
                             },
                             {
-                                "desc": "Fish/Click + ",
+                                "desc": "+ ",
                                 "cost" : 5000,
                                 "costMulti" : 1.25,
                                 "countIncrease" : 1000,
@@ -32,7 +32,7 @@
                                 "displaying": false
                             },
                             {
-                                "desc": "Fish/Click + ",
+                                "desc": "+ ",
                                 "cost" : 100000,
                                 "costMulti" : 1.25,
                                 "countIncrease" : 50000,
@@ -42,7 +42,7 @@
   ], "class":"upgradeButton"},
     {"type":"auto", "data":[
                     {
-                        "desc": "Fish/Sec + ",
+                        "desc": "+ ",
                         "cost" : 100,
                         "costMulti" : 1.25,
                         "countIncrease" : 10,
@@ -50,7 +50,7 @@
                         "displaying": false
                     },
                     {
-                        "desc": "Fish/Sec + ",
+                        "desc": "+ ",
                         "cost" : 10000,
                         "costMulti" : 1.15,
                         "countIncrease" : 1000,
@@ -58,7 +58,7 @@
                         "displaying": false
                     },
                     {
-                        "desc": "Fish/Sec + ",
+                        "desc": "+ ",
                         "cost" : 100000,
                         "costMulti" : 1.15,
                         "countIncrease" : 10000,
@@ -66,7 +66,7 @@
                         "displaying": false
                     },
                     {
-                        "desc": "Fish/Sec + ",
+                        "desc": "+ ",
                         "cost" : 9000000,
                         "costMulti" : 1.15,
                         "countIncrease" : 1000000,

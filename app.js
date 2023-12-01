@@ -197,7 +197,7 @@ window.onclick = function(event) {
 }
 
 $("#debugBttn").click(function(){
-    gameData.fish.value += 1000;
+    //gameData.fish.value += 1000;
 });
 
 //Feature Unlock Buttons ---------------
@@ -206,7 +206,7 @@ $("#shopUpgrades").on('click', ".featureButton", function(){
     let index = this.getAttribute("index");
     let upgrade = gameData.upgradesList[getUpgradeListIndex(this.getAttribute("type"))].data[index];
     //Handle load file
-    if (gameData.fish.count > upgrade.cost){
+    if (gameData.fish.count > upgrade.cost && !upgrade.bought){
         $(this).prop("disabled", true);
         $(this).css("background-color", "#00FF33");
         $(this).css("color", "black");
@@ -221,6 +221,7 @@ function shopBttnHandling(name){
     switch (name){
         case "autoFishUnlock":
             addUpgrade(0,"auto","#autoUpgrades");
+            $("#ShopUnlockIndicator1").remove();
             break;;
         case "maxBuyUnlockClick":
             addBuyMax(0,"fish");
@@ -365,11 +366,13 @@ function buttonCheck(button){
        const index = button.getAttribute("index");
        const upgrade = gameData.upgradesList[getUpgradeListIndex(button.getAttribute("type"))].data[index];
        const cost = upgrade.cost;
-        if (gameData.fish.count < cost && !upgrade.disabled) {
-               button.disabled = true;
-             } else {
-               button.disabled = false;
-             }
+       if (upgrade.bought){
+            button.disabled = true;
+       }else if (gameData.fish.count < cost) {
+        button.disabled = true;
+        } else {
+        button.disabled = false;
+        }
     });
 }
 
@@ -377,7 +380,7 @@ function buttonCheck(button){
 function initializeButtons(){
     checkUnlocks();
     document.querySelectorAll('.featureButton').forEach(function (button){
-        // Disable the button if the player doesn't have enough fish to buy the upgrade
+        //Disable the button if the player doesn't have enough fish to buy the upgrade
         //Handle bought buttons
         const index = button.getAttribute("index");
         let upgrade = gameData.upgradesList[getUpgradeListIndex(button.getAttribute("type"))].data[index];
@@ -401,7 +404,7 @@ function checkUnlocks(){
     }
 }
 
-// Function to update the display
+// Function to update the display / MAIN GAME LOOP
 function updateDisplay() {
     $("#fishCount").html(formatNumber(gameData.fish.count));
     $("#fishValue").html(formatNumber(gameData.fish.value));
