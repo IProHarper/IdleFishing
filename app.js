@@ -1,6 +1,30 @@
 #!/usr/bin/env node
 var Decimal = require("break_infinity.js");
 var gameData;
+var fishUpgrades;
+var prestigeUpgrades;
+
+function loadJSONS(){
+    $.getJSON('./Data/prestigeUpgrades.json', function(upgrades) {
+        // Process the upgrades
+        prestigeUpgrades = upgrades;
+        if (!gameData.upgradesList.includes(upgrades)){
+            gameData.upgradesList.push(upgrades);
+        }
+        console.log(upgrades);
+        console.log(gameData.upgradesList);
+    })
+    .fail(function(error) {
+        console.error('Error loading Prestige Upgrades:', error);
+    });
+    $.getJSON('./Data/fishUpgrades.json', function(upgrades) {
+        // Process the upgrades
+        fishUpgrades = upgrades.data;
+    })
+    .fail(function(error) {
+        console.error('Error loading Fish Upgrades:', error);
+    });
+}
 
 $(document).ready(function(){
 
@@ -110,7 +134,7 @@ $(document).ready(function(){
 //     }
 // ];
 let gameStages = [
-    { threshold: 1000, action: unlockStage1 },
+    { threshold: 1000, action: unlockStage1 },//1k
     { threshold: 5000, action: unlockStage2 },//5k
     { threshold: 20000, action: unlockNewBttn, vars: {type:"fish", index:2} },//20k
     { threshold: 500000, action: unlockNewBttn, vars: {type:"auto", index:2} },//500k
@@ -118,6 +142,23 @@ let gameStages = [
     { threshold: 100000000, action: unlockNewBttn, vars: {type:"auto", index:3} },//100m
     { threshold: 500000000, action: unlockStage3, vars: {type:"feature", index:1} }//500m
 ];
+
+
+//Trying out classes. 
+//Class for gameStage to progress simplier
+class gameStage {
+    constructor(req, action, vars){
+        this.req = req;
+        this.action = action;
+        this.vars = vars;
+    }
+
+    progressGameStage(){
+        gameStage++;
+    }
+
+  
+}
 
 //GAME PROGRESSION Functions
 //-------------------------------
@@ -171,7 +212,7 @@ $("#homeBttn").click(function(){
 });
 $("#ResetBttn").click(function(){
     if (confirm("Warning! You are about to Reset all progress and start from 0.\nAre you sure you wish to continue?")){
-        fetch("./initData.json")
+        fetch("./Data/initData.json")
         .then(response => response.json())
         .then(json => gameData = json);
         setTimeout(() => updateDisplay(), 250);
@@ -197,7 +238,7 @@ window.onclick = function(event) {
 }
 
 $("#debugBttn").click(function(){
-    //gameData.fish.value += 1000;
+    gameData.fish.value += 1000;
 });
 
 //Feature Unlock Buttons ---------------
@@ -229,6 +270,9 @@ function shopBttnHandling(name){
         case "maxBuyUnlockAuto":
             addBuyMax(1,"auto");
             break;;
+        case "prestigeUnlock":
+            prestigeFish1();
+            break;;
         default:
             alert("Couldn't find handler");
     }
@@ -242,17 +286,7 @@ function addBuyMax(index,type){
         button.append(newUpgrade);
     });
 }
-//Calculate how many upgradescan be bought
-function calcBuyMax(upgrade){
-    //t = total cost, c = cost, m = Max upgrades
-    let [t,m,c] = [0,0,upgrade.cost];
-    while (t + c <= gameData.fish.count) {
-        t += c;
-        c *= upgrade.costMulti;
-        m++;
-    }
-    return (m,t);
-}
+
 
 //Add upgrade buttons from the upgradesList
 function addUpgrade(index,type,id){
@@ -322,8 +356,20 @@ function getUpgradeListIndex(type){
     }
 }
 
-//Disable/Enable buttons based on cost
 
+
+function prestigeFish1(){
+    if (gameData.prestigeData.timesPrestiged == 0){
+        switchModal("#progressionModal");
+        let header = `Welcome to your FIRST Prestige!`
+        $("#modalProgressHeader").append(header);
+        let page = `You now have ${gameData.prestigeData.prestigeCoins} to spend on some fun new Upgrades`
+        $("#modalProgressPage").append(page);
+    }
+    for (let i=0; i< prestigeUpgrades.length; i++){
+        addUpgrade(i, "prestige", "#prestigeUpgrades");
+    }
+}
 
 //Format the number as 1k, 1m then 1eX
 //ADD A SWITCH 
@@ -345,6 +391,11 @@ function formatNumber(number) {
 function switchMenu(menu){
     $("#pageDisplay").children().css("display", "none");
     $(menu).css("display", "table");
+}
+//Hide all the irrelevant pages
+function switchModal(menu){
+    $(".modal-body").children().css("display", "none");
+    $(menu).css("display", "grid");
 }
 
 //Check all game buttons and update their status
@@ -391,56 +442,6 @@ function initializeButtons(){
      });
 }
 
-
-
-//Progressive unlocks.
-function checkUnlocks(){
-    for (let stage of gameStages) { 
-        const index = gameStages.findIndex((s) => s === stage);
-        if (gameData.fish.lifetime > stage.threshold && gameData.gamestage === index) {
-            if (stage.vars){ stage.action(stage.vars.index,stage.vars.type);}
-            else { stage.action(); }
-        }
-    }
-}
-
-// Function to update the display / MAIN GAME LOOP
-function updateDisplay() {
-    $("#fishCount").html(formatNumber(gameData.fish.count));
-    $("#fishValue").html(formatNumber(gameData.fish.value));
-    $("#fishPerSec").html(formatNumber(gameData.fish.perSecond));
-    $("#fishlifetime").html(formatNumber(gameData.fish.lifetime));
-    checkUnlocks();
-    buttonCheck();
-}
-
-// Function to initialize the game
-function initializeGame() {
-    fetch("./initData.json")
-    .then(response => response.json())
-    .then(data => {
-      gameData = data;
-      checkSaveFile();
-      addUpgrade(0,"fish","#fishUpgrades");
-      addUpgrade(1,"fish","#fishUpgrades");
-      initializeButtons();
-      updateDisplay();
-    })
-    .catch(error => {
-      console.error('Error loading game data: ' + error);
-    });
-    //var time = Date.now();
-}
-
-//MAIN CODE LOOP
-// Initialize the game
-initializeGame();
-
-var saveGameLoop = window.setInterval(function() {
-    saveGame();
-  }, 15000);
-
-
 //Save file stufff
 function checkSaveFile(){
     if (localStorage.getItem("idleFishingData-IProHarper")){
@@ -464,6 +465,62 @@ function saveGame(){
                 savePopup.classList.remove('show');
             }, 2000);
 }
+
+
+
+//Progressive unlocks.
+function checkUnlocks(){
+    for (let stage of gameStages) { 
+        const index = gameStages.findIndex((s) => s === stage);
+        if (gameData.fish.lifetime > stage.threshold && gameData.gamestage === index) {
+            if (stage.vars){ stage.action(stage.vars.index,stage.vars.type);}
+            else { stage.action(); }
+        }
+    }
+}
+
+// Function to update the display / MAIN GAME LOOP
+function updateDisplay() {
+    //Update Fish values on the screen
+    $("#fishCount").html(formatNumber(gameData.fish.count));
+    $("#fishValue").html(formatNumber(gameData.fish.value));
+    $("#fishPerSec").html(formatNumber(gameData.fish.perSecond));
+    $("#fishlifetime").html(formatNumber(gameData.fish.lifetime));
+    checkUnlocks();
+    buttonCheck();
+}
+
+// Function to initialize the game
+function initializeGame() {
+    fetch("./Data/initData.json")
+    .then(response => response.json())
+    .then(data => {
+      gameData = data;
+      checkSaveFile();
+      addUpgrade(0,"fish","#fishUpgrades");
+      addUpgrade(1,"fish","#fishUpgrades");
+      initializeButtons();
+      updateDisplay();
+      loadJSONS();
+    })
+    .catch(error => {
+      console.error('Error loading game data: ' + error);
+    });
+    //var time = Date.now();
+}
+
+//MAIN CODE LOOP
+// Initialize the game
+
+initializeGame();
+
+
+var saveGameLoop = window.setInterval(function() {
+    saveGame();
+  }, 30000);
+
+
+
 
 
 });
