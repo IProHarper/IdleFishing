@@ -1,0 +1,24 @@
+{
+ "type": "prestige", 
+ "data": [
+   {
+   "name" : "Fish Multiplier",
+   "desc" : "Increases the amount of fish you get from everything by: ",
+   "cost" : 1,
+   "bought" : false
+   },
+   {
+    "name" : "Fish Per Second +",
+    "desc" : "Unlock more Fish per Second upgrades",
+    "cost" : 1,
+    "bought" : false
+    },
+    {
+     "name" : "Fish Per Click +",
+     "desc" : "Unlock more Fish per Click upgrades",
+     "cost" : 1,
+     "bought" : false
+     }
+ ],
+ "class": "prestigeButton"
+}

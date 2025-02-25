@@ -1,0 +1,38 @@
+{
+ "type": "fish", 
+ "data":[
+ {
+     "desc": "+ ",
+     "cost" : 10,
+     "costMulti" : 1.2,
+     "countIncrease" : 1,
+     "level" : 0,
+     "displaying": true
+ },
+ {
+     "desc": "+ ",
+     "cost" : 100,
+     "costMulti" : 1.25,
+     "countIncrease" : 10,
+     "level" : 0,
+     "displaying": true
+ },
+ {
+     "desc": "+ ",
+     "cost" : 5000,
+     "costMulti" : 1.25,
+     "countIncrease" : 1000,
+     "level" : 0,
+     "displaying": false
+ },
+ {
+     "desc": "+ ",
+     "cost" : 100000,
+     "costMulti" : 1.25,
+     "countIncrease" : 50000,
+     "level" : 0,
+     "displaying": false
+ }
+],
+"class": "upgradeButton"
+}
